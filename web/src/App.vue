@@ -20,7 +20,7 @@ body {
   /*
     @表示当前项目的根目录
   */
-  background-image: url("@/assets/background.png");
+  background-image: url("@/assets/images/background.png");
   background-size: cover;
 }
 </style>
