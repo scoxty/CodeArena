@@ -10,7 +10,7 @@ export class GameMap extends GameObject {
         this.parent = parent;
 
         this.L = 0; // 地图由小正方形组成，L表示小正方形边长
-        // 让长宽的奇偶性不同，避免出现两两同时到达一个位置的情况
+        // 让地图长宽的奇偶性不同，避免出现两两同时到达一个位置的情况
         /**
          * A:(11, 1) 偶、奇、偶、奇...
          * B:(1, 12) 奇、偶、奇、偶...
@@ -201,6 +201,5 @@ export class GameMap extends GameObject {
                 this.ctx.fillRect(c * this.L, r * this.L, this.L, this.L);
             }
         }
-
     }
 }

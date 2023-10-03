@@ -11,7 +11,7 @@ import java.io.IOException;
  * 解决跨域问题
  */
 
-@Configuration
+@Configuration // 待删除
 public class CorsConfig implements Filter {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
