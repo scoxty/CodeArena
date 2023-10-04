@@ -23,12 +23,9 @@ public class RegisterServiceImpl implements RegisterService {
     @Override
     public Map<String, String> register(String username, String password, String confirmedPassword) {
         Map<String, String> resp = new HashMap<>();
+
         if (username == null) {
-            resp.put("error_msg", "用户名不能为空!");
-            return resp;
-        }
-        if (password == null || confirmedPassword == null) {
-            resp.put("error_msg", "密码不能为空!");
+            resp.put("error_msg", "用户名为空指针!");
             return resp;
         }
         username = username.trim(); // 删除头尾空白字符
@@ -40,19 +37,28 @@ public class RegisterServiceImpl implements RegisterService {
             resp.put("error_msg", "用户名长度不能大于100!");
             return resp;
         }
-        if (password.length() > 100 || confirmedPassword.length() > 100) {
-            resp.put("error_msg", "密码的长度不大于100!");
-            return resp;
-        }
-        if (!password.equals(confirmedPassword)) {
-            resp.put("error_msg", "两次输入的密码不一致!");
-            return resp;
-        }
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getUsername, username);
         User user = userMapper.selectOne(queryWrapper);
         if (user != null) {
             resp.put("error_msg", "用户名已存在!");
+            return resp;
+        }
+
+        if (password == null || confirmedPassword == null) {
+            resp.put("error_msg", "密码为空指针!");
+            return resp;
+        }
+        if (password == "" || confirmedPassword == "") {
+            resp.put("error_msg", "密码不能为空!");
+            return resp;
+        }
+        if (password.length() > 100 || confirmedPassword.length() > 100) {
+            resp.put("error_msg", "密码的长度不能大于100!");
+            return resp;
+        }
+        if (!password.equals(confirmedPassword)) {
+            resp.put("error_msg", "两次输入的密码不一致!");
             return resp;
         }
 
