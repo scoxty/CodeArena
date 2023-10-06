@@ -33,17 +33,40 @@ public class AddServiceImpl implements AddService {
 
         Map<String, String> resp = new HashMap<>();
 
-        if (title != null && title.length() > 100) {
+        if (title == null) {
+            resp.put("error_msg", "标题参数为null!");
+            return resp;
+        }
+        if (title.length() == 0) {
+            resp.put("error_msg", "标题不能为空!");
+            return resp;
+        }
+        if (title.length() > 100) {
             resp.put("error_msg", "标题长度不能大于100");
             return resp;
         }
 
-        if (description != null && description.length() > 300) {
+        if (description == null) {
+            resp.put("error_msg", "Bot的描述参数为null");
+            return resp;
+        }
+        if (description.length() == 0) {
+            resp.put("error_msg", "Bot的描述不能为空");
+        }
+        if (description.length() > 300) {
             resp.put("error_msg", "Bot的描述长度不能大于300");
             return resp;
         }
 
-        if (content != null && content.length() > 10000) {
+        if (content == null) {
+            resp.put("error_msg", "Bot的content参数为null");
+            return resp;
+        }
+        if (content.length() == 0) {
+            resp.put("error_msg", "Bot的content不能为空");
+            return resp;
+        }
+        if (content.length() > 10000) {
             resp.put("error_msg", "Bot的content长度不能大于10000");
             return resp;
         }

@@ -27,6 +27,7 @@ public class UpdateServiceImpl implements UpdateService {
         UserDetailsImpl loginUser = (UserDetailsImpl) authenticationToken.getPrincipal();
         User user = loginUser.getUser();
 
+        System.out.println(req.get("bot_id"));
         int bot_id = Integer.parseInt(req.get("bot_id"));
         String title = req.get("title");
         String description = req.get("description");
@@ -35,15 +36,40 @@ public class UpdateServiceImpl implements UpdateService {
 
         Map<String, String> resp = new HashMap<>();
 
-        if (title != null && title.length() > 100) {
+        if (title == null) {
+            resp.put("error_msg", "标题参数为null!");
+            return resp;
+        }
+        if (title.length() == 0) {
+            resp.put("error_msg", "标题不能为空!");
+            return resp;
+        }
+        if (title.length() > 100) {
             resp.put("error_msg", "标题长度不能大于100");
             return resp;
         }
-        if (description != null && description.length() > 300) {
+
+        if (description == null) {
+            resp.put("error_msg", "Bot的描述参数为null");
+            return resp;
+        }
+        if (description.length() == 0) {
+            resp.put("error_msg", "Bot的描述不能为空");
+        }
+        if (description.length() > 300) {
             resp.put("error_msg", "Bot的描述长度不能大于300");
             return resp;
         }
-        if (content != null && content.length() > 10000) {
+
+        if (content == null) {
+            resp.put("error_msg", "Bot的content参数为null");
+            return resp;
+        }
+        if (content.length() == 0) {
+            resp.put("error_msg", "Bot的content不能为空");
+            return resp;
+        }
+        if (content.length() > 10000) {
             resp.put("error_msg", "Bot的content长度不能大于10000");
             return resp;
         }
@@ -53,7 +79,7 @@ public class UpdateServiceImpl implements UpdateService {
             resp.put("error_msg", "Bot不存在或已被删除!");
             return resp;
         }
-        if (bot.getUserId() != user.getId()) {
+        if (!bot.getUserId().equals(user.getId())) {
             resp.put("error_msg", "非Bot作者，没有权限修改!");
             return resp;
         }

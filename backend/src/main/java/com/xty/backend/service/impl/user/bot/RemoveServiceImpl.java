@@ -21,7 +21,7 @@ public class RemoveServiceImpl implements RemoveService {
 
     @Override
     public Map<String, String> remove(Map<String, String> req) {
-        int bot_id = Integer.parseInt(req.get("bit_id"));
+        int bot_id = Integer.parseInt(req.get("bot_id"));
         UsernamePasswordAuthenticationToken authenticationToken =
                 (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl loginUser = (UserDetailsImpl) authenticationToken.getPrincipal();
@@ -35,7 +35,7 @@ public class RemoveServiceImpl implements RemoveService {
             resp.put("error_msg", "Bot不存在或已被删除!");
             return resp;
         }
-        if (bot.getUserId() != user.getId()) {
+        if (!bot.getUserId().equals(user.getId())) {
             resp.put("error_msg", "你不是Bot的作者，没有权限删除!");
             return resp;
         }
