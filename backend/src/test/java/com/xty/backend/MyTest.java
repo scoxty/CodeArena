@@ -4,9 +4,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Date;
+
 public class MyTest {
     @Test
-    public void test() {
+    public void testPassword() {
         //创建解析器
         PasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -20,5 +22,22 @@ public class MyTest {
 //        //判断原字符加密后和内容是否匹配
 //        boolean result = encoder.matches("123",password);
 //        System.out.println("============="+result);
+    }
+
+    @Test
+    public void testDate() {
+        Date date = new Date();
+        System.out.println(date);
+    }
+
+    @Test
+    public void test() {
+        Integer a = 1;
+        Integer b = 1;
+        if (a == b) {
+            System.out.println("Yes");
+        } else {
+            System.out.println("No");
+        }
     }
 }
