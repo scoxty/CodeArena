@@ -3,11 +3,12 @@ import { Snake } from "./Snake";
 import { Wall } from "./Wall";
 
 export class GameMap extends GameObject {
-    constructor(ctx, parent) { // ctx:画布 parent:画布的父元素
+    constructor(ctx, parent, store) { // ctx:画布 parent:画布的父元素
         super();
 
         this.ctx = ctx;
         this.parent = parent;
+        this.store = store;
 
         this.L = 0; // 地图由小正方形组成，L表示小正方形边长
         // 让地图长宽的奇偶性不同，避免出现两两同时到达一个位置的情况
@@ -27,69 +28,8 @@ export class GameMap extends GameObject {
         ];
     }
 
-    check_connective(g, x1, y1, x2, y2) {
-        if (x1 == x2 && y1 == y2) {
-            return true;
-        }
-
-        g[x1][y1] = true;
-
-        let dx = [-1, 0, 1, 0], dy = [0, 1, 0, -1];
-
-        for (let i = 0; i < 4; i++) {
-            let x = x1 + dx[i], y = y1 + dy[i];
-            if (!g[x][y] && this.check_connective(g, x, y, x2, y2)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     create_walls() {
-        const g = []; // 标记障碍物
-        for (let r = 0; r < this.row; r++) {
-            g[r] = [];
-            for (let c = 0; c < this.col; c++) {
-                g[r][c] = false;
-            }
-        }
-
-        // 给四周添加障碍物
-        for (let r = 0; r < this.row; r++) {
-            g[r][0] = g[r][this.col - 1] = true;
-        }
-
-        for (let c = 0; c < this.col; c++) {
-            g[0][c] = g[this.row - 1][c] = true;
-        }
-
-        // 创建内部随机障碍物
-        // 保证双方公平，按中心对称的方式放置。
-        for (let i = 0; i < this.inner_walls_count / 2; i++) {
-            for (let j = 0; j < 1000; j++) { // 避免重复，随机1000次
-                let r = parseInt(Math.random() * this.row);
-                let c = parseInt(Math.random() * this.col);
-
-                if (g[r][c] || g[this.row - 1 - r][this.col - 1 - c]) {
-                    continue;
-                }
-
-                // 左下角和右上角为玩家起点，不能有障碍物
-                if (r == this.row - 2 && c == 1 || r == 1 && c == this.col - 2) {
-                    continue;
-                }
-
-                g[r][c] = g[this.row - 1 - r][this.col - 1 - c] = true;
-                break;
-            }
-        }
-
-        const copy_g = JSON.parse(JSON.stringify(g)); // 深拷贝
-        // 判断是否联通
-        if (!this.check_connective(copy_g, this.row - 2, 1, 1, this.col - 2)) {
-            return false;
-        }
+        const g = this.store.state.pk.gamemap;
 
         for (let r = 0; r < this.row; r++) {
             for (let c = 0; c < this.col; c++) {
@@ -104,34 +44,28 @@ export class GameMap extends GameObject {
 
     add_listening_events() {
         this.ctx.canvas.focus();
-
-        const [snake0, snake1] = this.snakes;
         this.ctx.canvas.addEventListener("keydown", e => {
+            let d = -1;
             if (e.key === 'w')
-                snake0.set_direction(0);
+                d = 0;
             else if (e.key === 'd')
-                snake0.set_direction(1);
+                d = 1;
             else if (e.key === 's')
-                snake0.set_direction(2);
+                d = 2;
             else if (e.key === 'a')
-                snake0.set_direction(3);
-            else if (e.key === 'ArrowUp')
-                snake1.set_direction(0);
-            else if (e.key === 'ArrowRight')
-                snake1.set_direction(1);
-            else if (e.key === 'ArrowDown')
-                snake1.set_direction(2);
-            else if (e.key === 'ArrowLeft')
-                snake1.set_direction(3);
+                d = 3;
+
+            if (d >= 0) {
+                this.store.state.pk.socket.send(JSON.stringify({
+                    event: "move",
+                    direction: d,
+                }))
+            }
         });
     }
 
     start() {
-        for (let i = 0; i < 1000; i++) {
-            if (this.create_walls()) {
-                break;
-            }
-        }
+        this.create_walls()
         this.add_listening_events();
     }
 

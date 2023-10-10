@@ -63,11 +63,6 @@ export class Snake extends GameObject {
         for (let i = k; i > 0; i--) {
             this.cells[i] = JSON.parse(JSON.stringify(this.cells[i - 1]));
         }
-
-        // 若到达非法位置，则更新蛇的状态为：死亡
-        if (!this.gamemap.check_valid(this.next_cell)) {
-            this.status = "die";
-        }
     }
 
     check_tail_increasing() { // 检测到前蛇的长度是否增加
