@@ -3,8 +3,10 @@ package com.xty.backend.consumer;
 import com.alibaba.fastjson2.JSONObject;
 import com.xty.backend.consumer.utils.Game;
 import com.xty.backend.consumer.utils.JwtAuthentication;
+import com.xty.backend.mapper.BotMapper;
 import com.xty.backend.mapper.RecordMapper;
 import com.xty.backend.mapper.UserMapper;
+import com.xty.backend.pojo.Bot;
 import com.xty.backend.pojo.User;
 import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
@@ -26,13 +28,14 @@ public class WebSocketServer {
     public final static ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>(); // 将前端建立的每个websocket连接在后端维护起来,对所有实例可见
     private User user;
     private Session session = null; // 维护连接
-    private Game game = null;
+    public Game game = null;
     private final static String addPlayerUrl = "http://127.0.0.1:3001/player/add";
     private final static String removePlayerUrl = "http://127.0.0.1:3001/player/remove";
     // websocket不是标准的spring组件，采取特殊注入方式
     private static UserMapper userMapper;
     public static RecordMapper recordMapper;
     public static RestTemplate restTemplate; // 可以在两个springboot之间通信
+    private static BotMapper botMapper;
 
     @Autowired
     public void setUserMapper(UserMapper userMapper) {
@@ -47,6 +50,11 @@ public class WebSocketServer {
     @Autowired
     public void setRestTemplate(RestTemplate restTemplate) {
         WebSocketServer.restTemplate = restTemplate;
+    }
+
+    @Autowired
+    public void setBotMapper(BotMapper botMapper) {
+        WebSocketServer.botMapper = botMapper;
     }
 
     @OnOpen
@@ -75,10 +83,11 @@ public class WebSocketServer {
         }
     }
 
-    public static void startGame(Integer aId, Integer bId) {
+    public static void startGame(Integer aId, Integer aBotId, Integer bId, Integer bBotId) {
         User a = userMapper.selectById(aId), b = userMapper.selectById(bId);
+        Bot botA = botMapper.selectById(aBotId), botB = botMapper.selectById(bBotId);
 
-        Game game = new Game(13, 14, 20, a.getId(), b.getId());
+        Game game = new Game(13, 14, 20, a.getId(), botA, b.getId(), botB);
         game.createMap();
         // 防止用户连接突然断开导致空指针异常
         if (users.get(a.getId()) != null) {
@@ -117,11 +126,12 @@ public class WebSocketServer {
         }
     }
 
-    private void startMatching() {
+    private void startMatching(Integer botId) {
         System.out.println("start-matching!");
         MultiValueMap<String, String> req = new LinkedMultiValueMap<>();
         req.add("user_id", this.user.getId().toString());
         req.add("rating", this.user.getRating().toString());
+        req.add("bot_id", botId.toString());
         restTemplate.postForObject(addPlayerUrl, req, String.class);
     }
 
@@ -133,9 +143,9 @@ public class WebSocketServer {
     }
 
     private void move(int direction) {
-        if (game.getPlayerA().getId().equals(user.getId())) {
+        if (game.getPlayerA().getId().equals(user.getId()) && game.getPlayerA().getBotId().equals(-1)) {
             game.setNextStepA(direction);
-        } else if (game.getPlayerB().getId().equals(user.getId())) {
+        } else if (game.getPlayerB().getId().equals(user.getId()) && game.getPlayerB().getBotId().equals(-1)) {
             game.setNextStepB(direction);
         }
     }
@@ -146,7 +156,7 @@ public class WebSocketServer {
         JSONObject data = JSONObject.parseObject(message);
         String event = data.getString("event");
         if ("start-matching".equals(event)) { // 将传来的消息当作路由
-            startMatching();
+            startMatching(data.getInteger("bot_id"));
         } else if ("stop-matching".equals(event)) {
             stopMatching();
         } else if ("move".equals(event)) {

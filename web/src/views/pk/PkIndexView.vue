@@ -23,6 +23,8 @@ export default {
 
         let socket = null;
         onMounted(() => {
+            store.commit("updateLoser", "none");
+
             store.commit("updateOpponent", {
                 username: "我的对手",
                 photo: "https://ts1.cn.mm.bing.net/th/id/R-C.ef3c5a1355076a8fb4984e04390e701a?rik=z7L2%2bzjyoKOr3Q&riu=http%3a%2f%2ficon.chrafz.com%2fuploads%2fallimg%2f160421%2f1-1604211630040-L.png&ehk=5Tex5iR2ZMOgoGge4XuHOBHlxxecnTlVi9kv5ojWhqg%3d&risl=&pid=ImgRaw&r=0",
@@ -45,7 +47,7 @@ export default {
                     store.commit("updateGame", data.game);
                     setTimeout(() => {
                         store.commit("updateStatus", "playing");
-                    }, 1000);
+                    }, 500);
                 } else if (data.event === "move") {
                     const game = store.state.pk.gameObject;
                     const [snake0, snake1] = game.snakes;

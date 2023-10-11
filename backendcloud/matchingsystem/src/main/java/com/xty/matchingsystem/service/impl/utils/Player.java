@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Player {
     private Integer userId;
+    private Integer botId;
     private Integer rating;
     private Integer waitingTime;
 }

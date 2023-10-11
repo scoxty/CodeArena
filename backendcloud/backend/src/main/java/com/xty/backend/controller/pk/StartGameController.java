@@ -17,7 +17,9 @@ public class StartGameController {
     @PostMapping("/pk/start/game")
     public String startGame(@RequestParam MultiValueMap<String, String> req) {
         Integer aId = Integer.parseInt(Objects.requireNonNull(req.getFirst("a_id")));
+        Integer aBotId = Integer.parseInt(Objects.requireNonNull(req.getFirst("a_bot_id")));
         Integer bId = Integer.parseInt(Objects.requireNonNull(req.getFirst("b_id")));
-        return startGameService.startGame(aId, bId);
+        Integer bBotId = Integer.parseInt(Objects.requireNonNull(req.getFirst("b_bot_id")));
+        return startGameService.startGame(aId, aBotId, bId, bBotId);
     }
 }
