@@ -32,7 +32,7 @@ public class WebSocketServer {
     private final static String addPlayerUrl = "http://127.0.0.1:3001/player/add";
     private final static String removePlayerUrl = "http://127.0.0.1:3001/player/remove";
     // websocket不是标准的spring组件，采取特殊注入方式
-    private static UserMapper userMapper;
+    public static UserMapper userMapper;
     public static RecordMapper recordMapper;
     public static RestTemplate restTemplate; // 可以在两个springboot之间通信
     private static BotMapper botMapper;

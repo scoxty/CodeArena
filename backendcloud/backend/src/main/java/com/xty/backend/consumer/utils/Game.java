@@ -1,9 +1,12 @@
 package com.xty.backend.consumer.utils;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.xty.backend.consumer.WebSocketServer;
 import com.xty.backend.pojo.Bot;
 import com.xty.backend.pojo.Record;
+import com.xty.backend.pojo.User;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -233,7 +236,33 @@ public class Game extends Thread {
         return res.toString();
     }
 
+    private void updateUserRating(Player player, Integer rating) {
+        User user = WebSocketServer.userMapper.selectById(player.getId());
+        user.setRating(rating);
+        WebSocketServer.userMapper.updateById(user);
+    }
+
     private void saveToDatabase() {
+        Integer ratingA = WebSocketServer.userMapper.selectById(playerA.getId()).getRating();
+        Integer ratingB = WebSocketServer.userMapper.selectById(playerB.getId()).getRating();
+
+        if ("A".equals(loser)) {
+            ratingA -= 2;
+            if (ratingA < 0) {
+                ratingA = 0;
+            }
+            ratingB += 5;
+        } else if ("B".equals(loser)) {
+            ratingA += 5;
+            ratingB -= 2;
+            if (ratingB < 0) {
+                ratingB = 0;
+            }
+        }
+
+        updateUserRating(playerA, ratingA);
+        updateUserRating(playerB, ratingB);
+
         Record record = new Record(
                 null,
                 playerA.getId(),

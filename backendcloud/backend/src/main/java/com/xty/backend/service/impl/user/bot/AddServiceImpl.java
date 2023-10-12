@@ -1,5 +1,6 @@
 package com.xty.backend.service.impl.user.bot;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xty.backend.mapper.BotMapper;
 import com.xty.backend.pojo.Bot;
 import com.xty.backend.pojo.User;
@@ -68,6 +69,13 @@ public class AddServiceImpl implements AddService {
         }
         if (content.length() > 10000) {
             resp.put("error_msg", "Bot的content长度不能大于10000");
+            return resp;
+        }
+
+        LambdaQueryWrapper<Bot> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Bot::getUserId, user.getId());
+        if (botMapper.selectCount(lambdaQueryWrapper) >= 5) {
+            resp.put("error_msg", "每个用户至多创建5个bot");
             return resp;
         }
 
