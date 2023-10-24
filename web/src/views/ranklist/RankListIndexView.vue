@@ -56,7 +56,7 @@ export default {
         const pull_page = page => {
             current_page = page;
             $.ajax({
-                url: "http://127.0.0.1:3000/rankList/getList",
+                url: "https://www.scoxty.com/api/rankList/getList",
                 type: "get",
                 data: {
                     page,
@@ -78,7 +78,7 @@ export default {
         pull_page(current_page);
 
         const update_pages = () => {
-            let max_pages = parseInt(Math.ceil(total_users / 3));
+            let max_pages = parseInt(Math.ceil(total_users / 10));
             let new_pages = [];
             for (let i = current_page - 2; i <= current_page + 2; i++) {
                 if (i >= 1 && i <= max_pages) {
@@ -97,7 +97,7 @@ export default {
             } else if (page === -1) {
                 page = current_page + 1;
             }
-            let max_pages = parseInt(Math.ceil(total_users / 3));
+            let max_pages = parseInt(Math.ceil(total_users / 10));
             if (page >= 1 && page <= max_pages) {
                 pull_page(page);
             }

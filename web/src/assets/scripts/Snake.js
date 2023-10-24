@@ -12,7 +12,7 @@ export class Snake extends GameObject {
         this.cells = [new Cell(info.r, info.c)]; // 存放蛇的身体，cells[0]存放蛇头
         this.next_cell = null; // 下一步的目的地
 
-        this.speed = 5; // 蛇每秒走5个格子
+        this.speed = 5; // 蛇每秒走5个格子即每200ms走1个格子
         this.direction = -1; // -1表示没有指令，0、1、2、3分别表示上、右、下、左。
         this.status = "idle"; // idle表示静止，move表示正在移动，die表示死亡
 

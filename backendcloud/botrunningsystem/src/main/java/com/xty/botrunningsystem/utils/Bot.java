@@ -6,7 +6,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Bot implements BotInterface {
+public class Bot implements java.util.function.Supplier<Integer> {
+
+    @Override
+    public Integer get() {
+        File file = new File("input.txt");
+        try {
+            Scanner sc = new Scanner(file);
+            return nextMove(sc.next());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     static class Cell {
         public int x, y;

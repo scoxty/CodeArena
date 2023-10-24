@@ -2,6 +2,14 @@
     <PlayGround v-if="$store.state.pk.status === 'playing'" />
     <MatchGround v-if="$store.state.pk.status === 'matching'" />
     <ResultBoard v-if="$store.state.pk.loser !== 'none'" />
+    <div class="user-color"
+        v-if="$store.state.pk.status === 'playing' && parseInt($store.state.user.id) === parseInt($store.state.pk.a_id)">
+        左下角
+    </div>
+    <div class="user-color"
+        v-if="$store.state.pk.status === 'playing' && parseInt($store.state.user.id) === parseInt($store.state.pk.b_id)">
+        右上角
+    </div>
 </template>
 
 <script>
@@ -19,7 +27,7 @@ export default {
     },
     setup() {
         const store = new useStore();
-        const socketUrl = `ws://127.0.0.1:3000/websocket/${store.state.user.token}`;
+        const socketUrl = `wss://www.scoxty.com/websocket/${store.state.user.token}`;
 
         store.commit("updateIsRecord", false);
 
@@ -49,7 +57,7 @@ export default {
                     store.commit("updateGame", data.game);
                     setTimeout(() => {
                         store.commit("updateStatus", "playing");
-                    }, 500);
+                    }, 200);
                 } else if (data.event === "move") {
                     const game = store.state.pk.gameObject;
                     const [snake0, snake1] = game.snakes;
@@ -84,4 +92,11 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+div.user-color {
+    text-align: center;
+    color: white;
+    font-size: 30px;
+    font-weight: 600;
+}
+</style>

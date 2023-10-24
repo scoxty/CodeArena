@@ -8,7 +8,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @Component
 public class Consumer extends Thread {
@@ -36,7 +40,7 @@ public class Consumer extends Thread {
 
     // 在code中的类名后添加uid
     private String addUid(String code, String uid) {
-        int k = code.indexOf(" implements BotInterface");
+        int k = code.indexOf(" implements java.util.function.Supplier<Integer>");
         return code.substring(0, k) + uid + code.substring(k);
     }
 
@@ -45,12 +49,20 @@ public class Consumer extends Thread {
         UUID uuid = UUID.randomUUID();
         String uid = uuid.toString().substring(0, 8);
         // 相同类名只会编译一次，为了处理每次输入，可在类名后拼接一个随机字符串。
-        BotInterface botInterface = Reflect.compile(
+        Supplier<Integer> botInterface = Reflect.compile(
                 "com.xty.botrunningsystem.utils.Bot" + uid,
                 addUid(bot.getBotCode(), uid)
         ).create().get();
 
-        Integer direction = botInterface.nextMove(bot.getInput());
+        File file = new File("input.txt");
+        try (PrintStream fout = new PrintStream(file)) {
+            fout.println(bot.getInput());
+            fout.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        Integer direction = botInterface.get();
         System.out.println("move-direction: " + bot.userId + " " + direction);
 
         MultiValueMap<String, String> req = new LinkedMultiValueMap<>();

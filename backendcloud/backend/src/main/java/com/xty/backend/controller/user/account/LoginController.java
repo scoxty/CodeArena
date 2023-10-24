@@ -16,7 +16,7 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
-    @PostMapping("/user/account/token")
+    @PostMapping("/api/user/account/token")
     public Map<String, String> login(@RequestParam Map<String, String> req) {
         String username = req.get("username");
         String password = req.get("password");
