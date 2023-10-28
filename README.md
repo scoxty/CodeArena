@@ -6,3 +6,7 @@ https://www.scoxty.com/pk
 
 # 项目设计概要：
 ![image](https://github.com/scoxty/Kob/assets/95528203/9d3c99a6-7119-407e-a487-a34aaf88765a)
+
+# 数据库ER图：
+![image](https://github.com/scoxty/Kob/assets/95528203/846f400f-5d4e-43f7-9913-4b18ea13b857)
+
