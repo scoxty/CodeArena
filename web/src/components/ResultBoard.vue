@@ -15,7 +15,7 @@
             Win
         </div>
         <div class="result-board-btn">
-            <button @click="restart" type="button" class="btn btn-warning btn-lg">
+            <button @click="restart" type="button" class="btn btn-secondary btn-lg">
                 再来一局!
             </button>
         </div>

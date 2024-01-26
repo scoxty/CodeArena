@@ -46,7 +46,7 @@ public class Bot implements java.util.function.Supplier<Integer> {
         return step % 3 == 1;    // 10回合之后没三回合长度+1
     }
 
-    // 通过操作字符串 返回玩家位置list      起始坐标         玩家操作信息字符串
+    // 根据收集的玩家操作, 计算并返回玩家的位置
     public static List<Cell> getCells(int sx, int sy, String steps) {
         List<Cell> res = new LinkedList<>();
         int x = sx, y = sy;

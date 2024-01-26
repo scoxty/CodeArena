@@ -18,5 +18,4 @@ public class InfoController {
     public Map<String, String> getInfo() {
         return infoService.getInfo();
     }
-
 }

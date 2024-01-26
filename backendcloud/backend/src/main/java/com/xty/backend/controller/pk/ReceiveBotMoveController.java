@@ -20,4 +20,13 @@ public class ReceiveBotMoveController {
         Integer direction = Integer.parseInt(Objects.requireNonNull(req.getFirst("direction")));
         return receiveBotMoveService.receiveBotMove(userId, direction);
     }
+
+    @PostMapping("/pkWithAI/receive/bot/move")
+    public String receiveBotMoveWithAI(@RequestParam MultiValueMap<String, String> req) {
+        Integer userIdA = Integer.parseInt(Objects.requireNonNull(req.getFirst("user_id_a")));
+        Integer directionA = Integer.parseInt(Objects.requireNonNull(req.getFirst("direction_a")));
+        Integer userIdB = Integer.parseInt(Objects.requireNonNull(req.getFirst("user_id_b")));
+        Integer directionB = Integer.parseInt(Objects.requireNonNull(req.getFirst("direction_b")));
+        return receiveBotMoveService.receiveBotMoveWithAI(userIdA, directionA, userIdB, directionB);
+    }
 }

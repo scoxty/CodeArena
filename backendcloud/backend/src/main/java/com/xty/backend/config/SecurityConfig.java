@@ -1,5 +1,6 @@
 package com.xty.backend.config;
 
+import com.xty.backend.filter.CorsFilter;
 import com.xty.backend.filter.JwtAuthenticationTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -22,6 +24,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     @Autowired
     private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+    @Autowired
+    private CorsFilter corsFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -38,10 +42,20 @@ public class SecurityConfig {
         http.csrf(CsrfConfigurer::disable) // 基于token，不需要csrf
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 基于token，不需要session
                 .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers("/api/user/account/token", "/api/user/account/register", "/pk/start/game", "/pk/receive/bot/move").permitAll() // 放行api
+                        .requestMatchers(
+                                "/api/user/account/token",
+                                "/api/user/account/register",
+                                "/pk/start/game",
+                                "/pkWithAI/start/game",
+                                "/pk/receive/bot/move",
+                                "/pkWithAI/receive/bot/move",
+                                "/api/user/account/qq/web/apply_code",
+                                "/api/user/account/qq/web/receive_code"
+                                ).permitAll() // 放行api
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(corsFilter, ChannelProcessingFilter.class)
                 .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -1,24 +1,35 @@
 package com.xty.backend.service.impl.user.account;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.xty.backend.mapper.BotMapper;
 import com.xty.backend.mapper.UserMapper;
+import com.xty.backend.pojo.Bot;
 import com.xty.backend.pojo.User;
 import com.xty.backend.service.user.account.RegisterService;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class RegisterServiceImpl implements RegisterService {
-
     @Autowired
     private UserMapper userMapper;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private BotMapper botMapper;
+
+    public static User AI = null;
+    public static List<Bot> AIBots = null;
+
 
     @Override
     public Map<String, String> register(String username, String password, String confirmedPassword) {

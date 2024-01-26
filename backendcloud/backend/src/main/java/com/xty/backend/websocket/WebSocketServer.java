@@ -1,13 +1,16 @@
-package com.xty.backend.consumer;
+package com.xty.backend.websocket;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.xty.backend.consumer.utils.Game;
-import com.xty.backend.consumer.utils.JwtAuthentication;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.xty.backend.service.impl.user.account.RegisterServiceImpl;
+import com.xty.backend.websocket.utils.Game;
+import com.xty.backend.websocket.utils.JwtAuthentication;
 import com.xty.backend.mapper.BotMapper;
 import com.xty.backend.mapper.RecordMapper;
 import com.xty.backend.mapper.UserMapper;
 import com.xty.backend.pojo.Bot;
 import com.xty.backend.pojo.User;
+import jakarta.annotation.PostConstruct;
 import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
@@ -18,23 +21,29 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @Component
 @ServerEndpoint("/websocket/{token}")  // 注意不要以'/'结尾
 public class WebSocketServer {
     public final static ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>(); // 将前端建立的每个websocket连接在后端维护起来,对所有实例可见
-    private User user;
     private Session session = null; // 维护连接
+
+    private User user;
+    public static User AI;
+    private static List<Bot> aiBots;
     public Game game = null;
+
     private final static String addPlayerUrl = "http://127.0.0.1:3001/player/add";
     private final static String removePlayerUrl = "http://127.0.0.1:3001/player/remove";
+    public static RestTemplate restTemplate; // 可以在两个springboot之间通信
+
     // websocket不是标准的spring组件，采取特殊注入方式
     public static UserMapper userMapper;
     public static RecordMapper recordMapper;
-    public static RestTemplate restTemplate; // 可以在两个springboot之间通信
     private static BotMapper botMapper;
 
     @Autowired
@@ -55,6 +64,16 @@ public class WebSocketServer {
     @Autowired
     public void setBotMapper(BotMapper botMapper) {
         WebSocketServer.botMapper = botMapper;
+    }
+
+    @PostConstruct
+    public void initAI() {
+        LambdaQueryWrapper<User> userQueryWrapper = new LambdaQueryWrapper<>();
+        userQueryWrapper.eq(User::getUsername, "代码幽灵");
+        AI = userMapper.selectOne(userQueryWrapper);
+        LambdaQueryWrapper<Bot> botQueryWrapper = new LambdaQueryWrapper<>();
+        botQueryWrapper.eq(Bot::getUserId, AI.getId());
+        aiBots = botMapper.selectList(botQueryWrapper);
     }
 
     @OnOpen
@@ -83,12 +102,47 @@ public class WebSocketServer {
         }
     }
 
+    public static void startGameWithAI(Integer userId, Integer botId) {
+        User user = userMapper.selectById(userId);
+        Bot bot = botMapper.selectById(botId);
+        Random random = new Random();
+        int idx = random.nextInt(4); // 选择AI参战的Bot
+
+        Game game = new Game(13, 14, 20, user.getId(), bot, AI.getId(), aiBots.get(idx));
+        game.createMap();
+
+        // 防止用户连接突然断开导致空指针异常
+        if (users.get(user.getId()) != null) {
+            users.get(user.getId()).game = game;
+        }
+        game.start();
+
+        JSONObject respGame = new JSONObject();
+        respGame.put("a_id", game.getPlayerA().getId());
+        respGame.put("a_sx", game.getPlayerA().getSx());
+        respGame.put("a_sy", game.getPlayerA().getSy());
+        respGame.put("b_id", game.getPlayerB().getId());
+        respGame.put("b_sx", game.getPlayerB().getSx());
+        respGame.put("b_sy", game.getPlayerB().getSy());
+        respGame.put("map", game.getG());
+        JSONObject resp = new JSONObject();
+        resp.put("event", "start-matching");
+        resp.put("opponent_username", AI.getUsername());
+        resp.put("opponent_photo", AI.getPhoto());
+        resp.put("game", respGame);
+        if (users.get(user.getId()) != null) {
+            users.get(user.getId()).sendMessage(resp.toJSONString());
+        }
+    }
+
+
     public static void startGame(Integer aId, Integer aBotId, Integer bId, Integer bBotId) {
         User a = userMapper.selectById(aId), b = userMapper.selectById(bId);
         Bot botA = botMapper.selectById(aBotId), botB = botMapper.selectById(bBotId);
 
         Game game = new Game(13, 14, 20, a.getId(), botA, b.getId(), botB);
         game.createMap();
+
         // 防止用户连接突然断开导致空指针异常
         if (users.get(a.getId()) != null) {
             users.get(a.getId()).game = game;

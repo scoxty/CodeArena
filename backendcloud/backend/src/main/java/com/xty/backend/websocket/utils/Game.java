@@ -1,9 +1,7 @@
-package com.xty.backend.consumer.utils;
+package com.xty.backend.websocket.utils;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.xty.backend.consumer.WebSocketServer;
+import com.xty.backend.websocket.WebSocketServer;
 import com.xty.backend.pojo.Bot;
 import com.xty.backend.pojo.Record;
 import com.xty.backend.pojo.User;
@@ -28,7 +26,9 @@ public class Game extends Thread {
     private ReentrantLock lock = new ReentrantLock();
     private String status = "playing"; // playing -> finished
     private String loser = ""; // all: 平局, A: A输, B: B输
+    private static final int K = 30; // Elo机制的K因子，可以根据需要调整
     private final static String addBotUrl = "http://127.0.0.1:3002/bot/add";
+    private final static String addBotWithAIUrl = "http://127.0.0.1:3002/botWithAI/add";
 
     public Game(Integer rows, Integer cols, Integer inner_walls_count, Integer idA, Bot botA, Integer idB, Bot botB) {
         this.rows = rows;
@@ -183,6 +183,24 @@ public class Game extends Thread {
         WebSocketServer.restTemplate.postForObject(addBotUrl, req, String.class);
     }
 
+    private void sendBotCodeWithAI() {
+        MultiValueMap<String, String> req = new LinkedMultiValueMap<>();
+
+        req.add("user_id", playerA.getId().toString());
+        if (playerA.getBotId().equals(-1)) {
+            req.add("bot_code", "");
+            req.add("input", "");
+        } else {
+            req.add("bot_code", playerA.getBotCode());
+            req.add("input", getInput(playerA));
+        }
+        req.add("ai_id", playerB.getId().toString());
+        req.add("ai_bot_code", playerB.getBotCode());
+        req.add("input2", getInput(playerB));
+
+        WebSocketServer.restTemplate.postForObject(addBotWithAIUrl, req, String.class);
+    }
+
     private boolean nextStep() { // 等待两名玩家下一步操作
         //由于前端动画200ms才能画一个格子
         //如果在此期间接收到的输入多于一步 只会留最后一步 多余的会被覆盖
@@ -193,8 +211,12 @@ public class Game extends Thread {
             e.printStackTrace();
         }
 
-        sendBotCode(playerA);
-        sendBotCode(playerB);
+        if (playerB.getId() != WebSocketServer.AI.getId()) {
+            sendBotCode(playerA);
+            sendBotCode(playerB);
+        } else {
+            sendBotCodeWithAI();
+        }
 
         try {
             for (int i = 0; i < 50; i ++) {
@@ -213,6 +235,8 @@ public class Game extends Thread {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        System.out.println("超过5s依旧没有成功获取两名玩家下一步操作");
 
         return false;
     }
@@ -242,26 +266,35 @@ public class Game extends Thread {
         WebSocketServer.userMapper.updateById(user);
     }
 
+    private double calculateExpectedScore(int rating1, int rating2) {
+        return 1.0 / (1.0 + Math.pow(10, (rating2 - rating1) / 400.0));
+    }
+
     private void saveToDatabase() {
-        Integer ratingA = WebSocketServer.userMapper.selectById(playerA.getId()).getRating();
-        Integer ratingB = WebSocketServer.userMapper.selectById(playerB.getId()).getRating();
+        int ratingA = WebSocketServer.userMapper.selectById(playerA.getId()).getRating();
+        int ratingB = WebSocketServer.userMapper.selectById(playerB.getId()).getRating();
+
+        double expectedScoreA = calculateExpectedScore(ratingA, ratingB);
+        double expectedScoreB = calculateExpectedScore(ratingB, ratingA);
+
+        double scoreA, scoreB;
 
         if ("A".equals(loser)) {
-            ratingA -= 2;
-            if (ratingA < 0) {
-                ratingA = 0;
-            }
-            ratingB += 5;
+            scoreA = 0; // A 输了
+            scoreB = 1; // B 赢了
         } else if ("B".equals(loser)) {
-            ratingA += 5;
-            ratingB -= 2;
-            if (ratingB < 0) {
-                ratingB = 0;
-            }
+            scoreA = 1; // A 赢了
+            scoreB = 0; // B 输了
+        } else { // 平局情况
+            scoreA = 0.5;
+            scoreB = 0.5;
         }
 
-        updateUserRating(playerA, ratingA);
-        updateUserRating(playerB, ratingB);
+        int newRatingA = ratingA + (int)(K * (scoreA - expectedScoreA));
+        int newRatingB = ratingB + (int)(K * (scoreB - expectedScoreB));
+
+        updateUserRating(playerA, newRatingA);
+        updateUserRating(playerB, newRatingB);
 
         Record record = new Record(
                 null,
@@ -354,6 +387,7 @@ public class Game extends Thread {
     public void run() {
         for (int i = 0; i < 1000; i ++) { //1000步之内游戏肯定结束
             if (nextStep()) { // 是否获取了两条蛇的下一步操作
+                System.out.println("获取到两条蛇下一步动作");
                 judge();
                 if (status.equals("playing")) {
                     sendMove();

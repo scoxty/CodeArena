@@ -22,4 +22,11 @@ public class StartGameController {
         Integer bBotId = Integer.parseInt(Objects.requireNonNull(req.getFirst("b_bot_id")));
         return startGameService.startGame(aId, aBotId, bId, bBotId);
     }
+
+    @PostMapping("/pkWithAI/start/game")
+    public String startGameWithAI(@RequestParam MultiValueMap<String, String> req) {
+        Integer userId = Integer.parseInt(Objects.requireNonNull(req.getFirst("user_id")));
+        Integer botId = Integer.parseInt(Objects.requireNonNull(req.getFirst("bot_id")));
+        return startGameService.startGameWithAI(userId, botId);
+    }
 }

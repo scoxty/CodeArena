@@ -17,7 +17,7 @@ public class SecurityConfig {
         http.csrf(CsrfConfigurer::disable) // 基于token，不需要csrf
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 基于token，不需要session
                 .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers("/bot/add").permitAll() // 放行api
+                        .requestMatchers("/bot/add", "/botWithAI/add").permitAll() // 放行api
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyRequest().authenticated()
                 );

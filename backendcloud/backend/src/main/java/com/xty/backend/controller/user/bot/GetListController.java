@@ -18,4 +18,5 @@ public class GetListController {
     public List<Bot> getList() {
         return getListService.getList();
     }
+
 }

@@ -6,6 +6,7 @@ import com.xty.backend.pojo.Bot;
 import com.xty.backend.pojo.User;
 import com.xty.backend.service.impl.utils.UserDetailsImpl;
 import com.xty.backend.service.user.bot.AddService;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +18,6 @@ import java.util.Map;
 
 @Service
 public class AddServiceImpl implements AddService {
-
     @Autowired
     private BotMapper botMapper;
 

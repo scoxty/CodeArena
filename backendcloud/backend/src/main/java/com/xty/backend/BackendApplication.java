@@ -12,9 +12,8 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 @MapperScan("com.xty.backend.mapper")
 public class BackendApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(BackendApplication.class, args);
+        System.out.println("BackendApplication启动完成!");
     }
-
 }

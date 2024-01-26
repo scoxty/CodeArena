@@ -1,9 +1,10 @@
-package com.xty.backend.config;
+package com.xty.backend.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
@@ -11,8 +12,8 @@ import java.io.IOException;
  * 解决跨域问题
  */
 
-@Configuration // TODO:待删除
-public class CorsConfig implements Filter {
+@Component
+public class CorsFilter implements Filter {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletResponse response = (HttpServletResponse) res;

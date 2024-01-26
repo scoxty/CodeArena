@@ -3,7 +3,11 @@
         <div class="container">
             <!-- 使用<router-link>代替<a>可以让每次请求不必刷新浏览器 -->
             <!-- <a class="navbar-brand active" href="/">Kob</a> -->
-            <router-link class="navbar-brand active" :to="{ name: 'home' }">Kob</router-link>
+            <router-link class="navbar-brand active" :to="{ name: 'home' }">CodeArena</router-link>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText"
+                aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
@@ -17,6 +21,10 @@
                     <li class="nav-item">
                         <router-link :class="route_name == 'ranklist_index' ? 'nav-link native' : 'nav-link'"
                             :to="{ name: 'ranklist_index' }">排行榜</router-link>
+                    </li>
+                    <li class="nav-item">
+                        <router-link :class="route_name == 'introduction_index' ? 'nav-link native' : 'nav-link'"
+                            :to="{ name: 'introduction_index' }">关于</router-link>
                     </li>
                 </ul>
                 <ul class="navbar-nav" v-if="$store.state.user.is_login">

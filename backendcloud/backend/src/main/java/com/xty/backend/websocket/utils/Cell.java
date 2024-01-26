@@ -1,4 +1,4 @@
-package com.xty.backend.consumer.utils;
+package com.xty.backend.websocket.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

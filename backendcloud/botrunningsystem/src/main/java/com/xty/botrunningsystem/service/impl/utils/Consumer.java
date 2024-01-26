@@ -50,7 +50,7 @@ public class Consumer extends Thread {
         String uid = uuid.toString().substring(0, 8);
         // 相同类名只会编译一次，为了处理每次输入，可在类名后拼接一个随机字符串。
         Supplier<Integer> botInterface = Reflect.compile(
-                "com.xty.botrunningsystem.utils.Bot" + uid,
+                "com.codearena.botrunningsystem.utils.Bot" + uid,
                 addUid(bot.getBotCode(), uid)
         ).create().get();
 

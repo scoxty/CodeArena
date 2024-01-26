@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BotRunningSystemApplication {
     public static void main(String[] args) {
         BotRunningServiceImpl.botPool.start();
+        BotRunningServiceImpl.botPoolWithAI.start();
         SpringApplication.run(BotRunningSystemApplication.class, args);
+        System.out.println("BotRunningSystemApplication启动完成!");
     }
 }

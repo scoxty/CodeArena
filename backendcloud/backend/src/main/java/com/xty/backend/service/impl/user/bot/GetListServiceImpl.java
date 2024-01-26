@@ -2,8 +2,10 @@ package com.xty.backend.service.impl.user.bot;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xty.backend.mapper.BotMapper;
+import com.xty.backend.mapper.UserMapper;
 import com.xty.backend.pojo.Bot;
 import com.xty.backend.pojo.User;
+import com.xty.backend.service.impl.user.account.RegisterServiceImpl;
 import com.xty.backend.service.impl.utils.UserDetailsImpl;
 import com.xty.backend.service.user.bot.GetListService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +13,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class GetListServiceImpl implements GetListService {
-
     @Autowired
     private BotMapper botMapper;
 
@@ -32,4 +34,5 @@ public class GetListServiceImpl implements GetListService {
 
         return bots;
     }
+
 }

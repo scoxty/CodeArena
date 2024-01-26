@@ -1,4 +1,4 @@
-package com.xty.backend.consumer.utils;
+package com.xty.backend.websocket.utils;
 
 import com.xty.backend.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
