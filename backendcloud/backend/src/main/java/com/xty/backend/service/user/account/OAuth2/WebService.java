@@ -1,4 +1,4 @@
-package com.xty.backend.service.user.account.OAuth2;
+package com.xty.backend.service.user.account.oauth2;
 
 import com.alibaba.fastjson2.JSONObject;
 

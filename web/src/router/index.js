@@ -7,8 +7,9 @@ import RecordContentView from '../views/record/RecordContentView.vue'
 import UserBotIndexView from '../views/user/bot/UserBotIndexView.vue'
 import UserAccountRegisterView from '../views/user/account/UserAccountRegisterView.vue'
 import UserAccountLoginView from '../views/user/account/UserAccountLoginView.vue'
-import IntroductionView from '../views/introduction/IntroductionView.vue'
 import store from '../store/index'
+import IntroductionView from '../views/introduction/IntroductionView.vue'
+import UserAccountQQWebReceiveCodeViewVue from '../views/user/account/UserAccountQQWebReceiveCodeView.vue'
 
 const routes = [
   {
@@ -23,6 +24,14 @@ const routes = [
     path: "/user/account/register",
     name: "user_account_register",
     component: UserAccountRegisterView,
+    meta: {
+      requestAuth: false,
+    },
+  },
+  {
+    path: "/user/account/qq/web/receive_code",
+    name: "user_account_qq_web_receive_code",
+    component: UserAccountQQWebReceiveCodeViewVue,
     meta: {
       requestAuth: false,
     },
@@ -60,20 +69,20 @@ const routes = [
     },
   },
   {
-    path: "/introduction",
-    name: "introduction_index",
-    component: IntroductionView,
-    meta: {
-      requestAuth: true,
-    }
-  },
-  {
     path: "/record/:recordId",
     name: "record_content",
     component: RecordContentView,
     meta: {
       requestAuth: true,
     },
+  },
+  {
+    path: "/introduction",
+    name: "introduction_index",
+    component: IntroductionView,
+    meta: {
+      requestAuth: true,
+    }
   },
   {
     path: "/user/bot",
@@ -114,3 +123,4 @@ router.beforeEach((to, from, next) => {
 })
 
 export default router
+

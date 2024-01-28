@@ -1,7 +1,7 @@
-package com.xty.backend.controller.OAuth2;
+package com.xty.backend.controller.user.account.oauth2;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.xty.backend.service.user.account.OAuth2.WebService;
+import com.xty.backend.service.user.account.oauth2.WebService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

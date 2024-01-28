@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor // 有参构造函数
 public class User {
     private Integer id;
+    private String openid;
     private String username;
     private String password;
     private String photo;

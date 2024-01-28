@@ -3,8 +3,19 @@ server:
   servlet:
     context-path: /
 
-# 连接池配置和时间配置
+# MySQL和Redis配置
 spring:
+  data:
+    redis:
+      database: 0
+      port: 6379
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1
+        host: localhost
   datasource:
     url: jdbc:mysql:///kob
     username: root

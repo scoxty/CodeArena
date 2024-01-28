@@ -14,6 +14,11 @@
                     <div class="error_msg"> {{ error_msg }} </div>
                     <button type="submit" class="btn btn-primary">登录</button>
                 </form>
+                <div style="text-align: center; margin-top: 20px; cursor: pointer;" @click="qq_login">
+                    <img width="30" src="../../../assets/images/qq_logo.png">
+                    <br>
+                    QQ一键登录
+                </div>
             </div>
         </div>
     </ContentField>
@@ -24,6 +29,7 @@ import ContentField from '../../../components/ContentField.vue'
 import { useStore } from 'vuex'
 import { ref } from 'vue'
 import router from '../../../router/index'
+import $ from 'jquery'
 
 export default {
     components: {
@@ -73,11 +79,24 @@ export default {
             })
         };
 
+        const qq_login = () => {
+            $.ajax({
+                url: "https://www.scoxty.com/api/user/account/qq/web/apply_code",
+                type: "GET",
+                success: resp => {
+                    if (resp.result === "success") {
+                        window.location.replace(resp.apply_code_url);
+                    }
+                }
+            })
+        }
+
         return {
             username,
             password,
             error_msg,
             login,
+            qq_login,
         }
     }
 }
