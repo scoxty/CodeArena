@@ -30,6 +30,8 @@ public Integer nextMove(String input) {
 ```
 
 样例：
+
+Java
 ```Java
 package com.codearena.botrunningsystem.utils;
 
@@ -39,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Bot implements java.util.function.Supplier<Integer> {
+public class AIBot implements java.util.function.Supplier<Integer> {
     static class Cell {
         public int x, y;
         public Cell(int x, int y) {
@@ -111,7 +113,7 @@ public class Bot implements java.util.function.Supplier<Integer> {
 
     @Override
     public Integer get() {
-        File file = new File("input.txt");
+        File file = new File("AI_Input.txt");
         try {
             Scanner sc = new Scanner(file);
             return nextMove(sc.next());
@@ -120,6 +122,282 @@ public class Bot implements java.util.function.Supplier<Integer> {
         }
     }
 }
+```
+
+Python
+
+```Python
+class Cell:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+def check_tail_increasing(step):
+    if step <= 10:
+        return True
+    return step % 3 == 1
+
+def get_cells(sx, sy, steps):
+    steps = steps[1:-1]  # 去除括号
+    res = []
+
+    dx = [-1, 0, 1, 0]
+    dy = [0, 1, 0, -1]
+    x, y = sx, sy
+    step = 0
+
+    res.append(Cell(x, y))
+    for d in steps:
+        direction = int(d)
+        x += dx[direction]
+        y += dy[direction]
+        res.append(Cell(x, y))
+        if not check_tail_increasing(step + 1):
+            res.pop(0)
+        step += 1
+
+    return res
+
+def next_move(input_str):
+    strs = input_str.split('#')
+    g = [[0 for _ in range(14)] for _ in range(13)]
+
+    for i, k in enumerate(strs[0]):
+        if k == '1':
+            g[i // 14][i % 14] = 1
+
+    a_sx, a_sy = int(strs[1]), int(strs[2])
+    b_sx, b_sy = int(strs[4]), int(strs[5])
+
+    a_cells = get_cells(a_sx, a_sy, strs[3])
+    b_cells = get_cells(b_sx, b_sy, strs[6])
+
+    for cell in a_cells + b_cells:
+        g[cell.x][cell.y] = 1
+
+    dx = [-1, 0, 1, 0]
+    dy = [0, 1, 0, -1]
+    for i in range(4):
+        x = a_cells[-1].x + dx[i]
+        y = a_cells[-1].y + dy[i]
+        if 0 <= x < 13 and 0 <= y < 14 and g[x][y] == 0:
+            return i
+
+    return 0
+
+def main():
+    try:
+        with open("/botrunning/input.txt", "r") as file:
+            input_str = file.read().strip()
+            print(next_move(input_str))
+    except FileNotFoundError as e:
+        print(e)
+
+if __name__ == "__main__":
+    main()
+```
+
+C
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Cell {
+    int x, y;
+} Cell;
+
+// 检验当前回合，长度是否增加
+int check_tail_increasing(int step) {
+    if (step <= 10) return 1; // 前10回合每回合长度+1
+    return step % 3 == 1;     // 10回合之后每三回合长度+1
+}
+
+// 根据收集的玩家操作，计算并返回玩家的位置
+Cell* getCells(int sx, int sy, char* steps, int* cellCount) {
+    int dx[] = {-1, 0, 1, 0};
+    int dy[] = {0, 1, 0, -1};
+    int x = sx, y = sy;
+    int step = 0;
+    Cell* res = (Cell*)malloc(sizeof(Cell) * strlen(steps));
+    int count = 0;
+    res[count++] = (Cell){x, y};
+
+    for (int i = 0; steps[i] != '\0'; i++) {
+        int d = steps[i] - '0';
+        x += dx[d];
+        y += dy[d];
+        res[count++] = (Cell){x, y};
+        if (!check_tail_increasing(++step)) {
+            // 移动数组前移
+            for(int j = 0; j < count - 1; j++) {
+                res[j] = res[j + 1];
+            }
+            count--;
+        }
+    }
+    *cellCount = count;
+    return res;
+}
+
+int main() {
+    FILE* file = fopen("/botrunning/input.txt", "r");
+    if (file == NULL) {
+        perror("File opening failed");
+        return EXIT_FAILURE;
+    }
+
+    char input[1024];
+    fscanf(file, "%s", input);
+    fclose(file);
+
+    char* token;
+    int g[13][14] = {0};
+    int aSx, aSy, bSx, bSy;
+    int cellCountA, cellCountB;
+
+    // Parse input
+    token = strtok(input, "#");
+    for (int i = 0, k = 0; i < 13; i++) {
+        for (int j = 0; j < 14; j++, k++) {
+            if (token[k] == '1') {
+                g[i][j] = 1;
+            }
+        }
+    }
+
+    token = strtok(NULL, "#");
+    aSx = atoi(token);
+    token = strtok(NULL, "#");
+    aSy = atoi(token);
+    token = strtok(NULL, "#");
+    Cell* aCells = getCells(aSx, aSy, token, &cellCountA);
+    
+    token = strtok(NULL, "#");
+    bSx = atoi(token);
+    token = strtok(NULL, "#");
+    bSy = atoi(token);
+    token = strtok(NULL, "#");
+    Cell* bCells = getCells(bSx, bSy, token, &cellCountB);
+
+    // 标记地图
+    for (int i = 0; i < cellCountA; i++) {
+        g[aCells[i].x][aCells[i].y] = 1;
+    }
+    for (int i = 0; i < cellCountB; i++) {
+        g[bCells[i].x][bCells[i].y] = 1;
+    }
+
+    int dx[] = {-1, 0, 1, 0}, dy[] = {0, 1, 0, -1};
+    for (int i = 0; i < 4; i++) {
+        int x = aCells[cellCountA - 1].x + dx[i];
+        int y = aCells[cellCountA - 1].y + dy[i];
+        if (x >= 0 && x < 13 && y >= 0 && y < 14 && g[x][y] == 0) {
+            printf("%d\n", i);
+            break;
+        }
+    }
+
+    free(aCells);
+    free(bCells);
+
+    return 0;
+}
+```
+
+C++
+
+```Cpp
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+class Cell {
+public:
+    int x, y;
+    Cell(int x, int y) : x(x), y(y) {}
+};
+
+bool check_tail_increasing(int step) {
+    if (step <= 10) return true;
+    return step % 3 == 1;
+}
+
+vector<Cell> getCells(int sx, int sy, const string& steps) {
+    vector<Cell> res;
+    int dx[] = {-1, 0, 1, 0}, dy[] = {0, 1, 0, -1};
+    int x = sx, y = sy;
+    int step = 0;
+    res.emplace_back(x, y);
+    for (char d : steps) {
+        int dir = d - '0';
+        x += dx[dir];
+        y += dy[dir];
+        res.emplace_back(x, y);
+        if (!check_tail_increasing(++step)) {
+            res.erase(res.begin());
+        }
+    }
+    return res;
+}
+
+int nextMove(const string& input) {
+    stringstream ss(input);
+    string token;
+    vector<string> tokens;
+    while (getline(ss, token, '#')) {
+        tokens.push_back(token);
+    }
+
+    int g[13][14] = {0};
+    for (int i = 0, k = 0; i < 13; ++i) {
+        for (int j = 0; j < 14; ++j, ++k) {
+            if (tokens[0][k] == '1') {
+                g[i][j] = 1;
+            }
+        }
+    }
+
+    int aSx = stoi(tokens[1]), aSy = stoi(tokens[2]);
+    int bSx = stoi(tokens[4]), bSy = stoi(tokens[5]);
+
+    auto aCells = getCells(aSx, aSy, tokens[3].substr(1, tokens[3].size() - 2));
+    auto bCells = getCells(bSx, bSy, tokens[6].substr(1, tokens[6].size() - 2));
+
+    for (const auto& c : aCells) g[c.x][c.y] = 1;
+    for (const auto& c : bCells) g[c.x][c.y] = 1;
+
+    int dx[] = {-1, 0, 1, 0}, dy[] = {0, 1, 0, -1};
+    for (int i = 0; i < 4; ++i) {
+        int x = aCells.back().x + dx[i];
+        int y = aCells.back().y + dy[i];
+        if (x >= 0 && x < 13 && y >= 0 && y < 14 && g[x][y] == 0) {
+            return i;
+        }
+    }
+
+    return 0;
+}
+
+int main() {
+    ifstream file("/botrunning/input.txt");
+    if (!file.is_open()) {
+        cerr << "File not found" << endl;
+        return -1;
+    }
+
+    string input;
+    file >> input;
+    cout << nextMove(input) << endl;
+
+    return 0;
+}
+
 ```
 ##### 人类参赛 
 键盘输入w、a、s、d控制己方蛇的移动方向。

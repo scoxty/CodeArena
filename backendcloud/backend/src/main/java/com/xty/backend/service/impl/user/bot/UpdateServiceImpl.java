@@ -31,6 +31,7 @@ public class UpdateServiceImpl implements UpdateService {
         String title = req.get("title");
         String description = req.get("description");
         String content = req.get("content");
+        String type = req.get("type");
         Date now = new Date();
 
         Map<String, String> resp = new HashMap<>();
@@ -72,6 +73,18 @@ public class UpdateServiceImpl implements UpdateService {
             resp.put("error_msg", "Bot的content长度不能大于10000");
             return resp;
         }
+        if (type == null) {
+            resp.put("error_msg", "Bot的type参数为null");
+            return resp;
+        }
+        if (type.length() == 0) {
+            resp.put("error_msg", "请选择编程语言");
+            return resp;
+        }
+        if (type.length() > 15) {
+            resp.put("error_msg", "type的长度不能大于15");
+            return resp;
+        }
 
         Bot bot = botMapper.selectById(bot_id);
         if (bot == null) {
@@ -89,6 +102,7 @@ public class UpdateServiceImpl implements UpdateService {
                 title,
                 description,
                 content,
+                type,
                 bot.getCreatetime(),
                 now
         );

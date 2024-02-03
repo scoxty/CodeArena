@@ -31,6 +31,7 @@ public class AddServiceImpl implements AddService {
         String title = req.get("title");
         String description = req.get("description");
         String content = req.get("content");
+        String type = req.get("type");
 
         Map<String, String> resp = new HashMap<>();
 
@@ -72,6 +73,20 @@ public class AddServiceImpl implements AddService {
             return resp;
         }
 
+        if (type == null) {
+            resp.put("error_msg", "Bot的type参数为null");
+            return resp;
+        }
+        if (type.length() == 0) {
+            resp.put("error_msg", "请选择编程语言");
+            return resp;
+        }
+        if (type.length() > 15) {
+            resp.put("error_msg", "type的长度不能大于15");
+            return resp;
+        }
+
+
         LambdaQueryWrapper<Bot> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Bot::getUserId, user.getId());
         if (botMapper.selectCount(lambdaQueryWrapper) >= 5) {
@@ -80,7 +95,7 @@ public class AddServiceImpl implements AddService {
         }
 
         Date now = new Date();
-        Bot bot = new Bot(null, user.getId(), title, description, content, now, now);
+        Bot bot = new Bot(null, user.getId(), title, description, content, type, now, now);
 
         botMapper.insert(bot);
         resp.put("error_msg", "success");

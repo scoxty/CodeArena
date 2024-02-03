@@ -1,46 +1,54 @@
 package com.xty.botrunningsystem.service.impl.utils;
 
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class BotPool extends Thread {
-    private final ReentrantLock lock = new ReentrantLock();
-    private final Condition condition = lock.newCondition();
-    private final Queue<Bot> bots = new LinkedList<>();
+@Component
+public class BotPool {
+    private final BlockingQueue<Bot> bots = new LinkedBlockingQueue<>();
 
-    public void addBot(Integer userId, String botCode, String input) {
-        lock.lock();
+    @Autowired
+    @Qualifier("botTaskExecutor")
+    private Executor botTaskExecutor;
+
+    @Autowired
+    private Consumer consumer;
+
+    @PostConstruct
+    public void init() {
+        botTaskExecutor.execute(this::processBots);
+    }
+
+    public void addBot(Bot bot) {
         try {
-            bots.add(new Bot(userId, botCode, input));
-            condition.signalAll();
-        } finally {
-            lock.unlock();
+            bots.put(bot);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
-    private void consume(Bot bot) {
-        Consumer consumer = new Consumer();
-        consumer.startTimeOut(2000, bot);
-    }
-
-    @Override
-    public void run() {
-        while (true) {
-            lock.lock();
-            if (bots.isEmpty()) {
-                try {
-                    condition.await(); // 自动释放锁
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    lock.unlock();
-                    break;
+    private void processBots() {
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                Bot bot = bots.take();
+                // 比较耗时，放后面
+                if (bot.getAiId() == null) {
+                    consumer.startTimeOut(2000, bot);
+                } else {
+                    consumer.startTimeOut(4000, bot); // 执行用户和人机的共两份代码
                 }
-            } else {
-                Bot bot = bots.remove();
-                lock.unlock();
-                consume(bot); // 比较耗时，放unlock后面
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
     }

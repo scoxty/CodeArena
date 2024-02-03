@@ -22,8 +22,8 @@ import java.util.Random;
 
 @Service
 public class WebServiceImpl implements WebService {
-    private static final String appId = "你的appID";
-    private static final String appSecret = "你的appSecret";
+    private static final String appId = "102091794";
+    private static final String appSecret = "RmunSt53g5F9oDNH";
     private static final String redirectUri = "https://www.scoxty.com/user/account/qq/web/receive_code";
     private static final String applyAccessTokenUrl = "https://graph.qq.com/oauth2.0/token";
     private static final String getUserInfoUrl = "https://graph.qq.com/user/get_user_info";
@@ -148,6 +148,7 @@ public class WebServiceImpl implements WebService {
                 1500
         );
         userMapper.insert(user);
+
         //生成JWT
         String jwt = JwtUtil.createJWT(user.getId().toString());
         resp.put("result", "success");

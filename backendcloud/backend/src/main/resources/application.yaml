@@ -15,11 +15,12 @@ spring:
           max-idle: 8
           min-idle: 0
           max-wait: -1
-        host: localhost
+        host: 略
+      password: 略
   datasource:
-    url: jdbc:mysql:///kob
-    username: root
-    password: xty510521
+    url: jdbc:mysql:///codearena
+    username: 略
+    password: 略
     driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
     time-zone: GMT+8

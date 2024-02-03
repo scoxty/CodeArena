@@ -1,5 +1,6 @@
 package com.xty.backend;
 
+import com.xty.backend.utils.JwtUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,12 +35,6 @@ public class MyTest {
 
     @Test
     public void test() {
-        Integer a = 1;
-        Integer b = 1;
-        if (a == b) {
-            System.out.println("Yes");
-        } else {
-            System.out.println("No");
-        }
+
     }
 }

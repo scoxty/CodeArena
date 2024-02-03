@@ -37,9 +37,24 @@
                                                 rows="3" placeholder="字数不超过300"></textarea>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="content" class="form-label">代码</label>
-                                            <VAceEditor v-model:value="botadd.content" @init="editorInit" lang="c_cpp"
-                                                theme="textmate" style="height: 300px" :options="{
+                                            <div class="row">
+                                                <label for="content" class="form-label col-6"
+                                                    style="text-align: left;">代码</label>
+                                                <div class="col-6 d-flex" style="gap: 10px; justify-content:flex-end">
+                                                    <label for="language" class="form-label"
+                                                        style="margin-top:auto;">选择编程语言</label>
+                                                    <select id="language" class="form-select" style="width: auto;"
+                                                        v-model="botadd.type">
+                                                        <option value="Java">Java</option>
+                                                        <option value="C">C</option>
+                                                        <option value="Cpp">C++</option>
+                                                        <option value="Python">Python</option>
+                                                        <!-- 可以根据需要添加更多语言 -->
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <VAceEditor v-model:value="botadd.content" @init="editorInit"
+                                                v-model:lang="botadd.type" theme="textmate" style="height: 300px" :options="{
                                                     enableBasicAutocompletion: true, //启用基本自动完成
                                                     enableSnippets: true, // 启用代码段
                                                     enableLiveAutocompletion: true, // 启用实时自动完成
@@ -98,10 +113,26 @@
                                                                 id="description" rows="3" placeholder="字数不超过300"></textarea>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="content" class="form-label">代码</label>
+                                                            <div class="row">
+                                                                <label for="content" class="form-label col-6"
+                                                                    style="text-align: left;">代码</label>
+                                                                <div class="col-6 d-flex"
+                                                                    style="gap: 10px; justify-content:flex-end">
+                                                                    <label for="language" class="form-label"
+                                                                        style="margin-top:auto;">选择编程语言</label>
+                                                                    <select id="language" class="form-select"
+                                                                        style="width: auto;" v-model="bot.type">
+                                                                        <option value="Java">Java</option>
+                                                                        <option value="C">C</option>
+                                                                        <option value="Cpp">C++</option>
+                                                                        <option value="Python">Python</option>
+                                                                        <!-- 可以根据需要添加更多语言 -->
+                                                                    </select>
+                                                                </div>
+                                                            </div>
                                                             <VAceEditor v-model:value="bot.content" @init="editorInit"
-                                                                lang="c_cpp" theme="textmate" style="height: 300px"
-                                                                :options="{
+                                                                v-model:lang="bot.type" theme="textmate"
+                                                                style="height: 300px" :options="{
                                                                     enableBasicAutocompletion: true, //启用基本自动完成
                                                                     enableSnippets: true, // 启用代码段
                                                                     enableLiveAutocompletion: true, // 启用实时自动完成
@@ -162,6 +193,7 @@ export default {
         const botadd = reactive({
             title: "",
             description: "",
+            type: "",
             content: "",
             error_msg: "",
         });
@@ -189,6 +221,7 @@ export default {
                 data: {
                     title: botadd.title,
                     description: botadd.description,
+                    type: botadd.type,
                     content: botadd.content,
                 },
                 headers: {
@@ -198,6 +231,7 @@ export default {
                     if (resp.error_msg === "success") {
                         botadd.title = "";
                         botadd.description = "";
+                        botadd.type = "";
                         botadd.content = "";
                         Modal.getInstance("#add-bot-btn").hide();
                         refresh_bots();
@@ -235,6 +269,7 @@ export default {
                     bot_id: bot.id,
                     title: bot.title,
                     description: bot.description,
+                    type: bot.type,
                     content: bot.content,
                 },
                 headers: {

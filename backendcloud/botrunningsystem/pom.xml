@@ -18,6 +18,19 @@
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
+<!--    <dependencyManagement>-->
+<!--        <dependencies>-->
+<!--            <dependency>-->
+<!--                <groupId>org.glassfish.jersey</groupId>-->
+<!--                <artifactId>jersey-bom</artifactId>-->
+<!--                <version>2.31</version>-->
+<!--                <type>pom</type>-->
+<!--                <scope>import</scope>-->
+<!--            </dependency>-->
+<!--        </dependencies>-->
+<!--    </dependencyManagement>-->
+
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -60,7 +73,70 @@
             <version>0.9.14</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java</artifactId>
+            <version>3.3.4</version> <!-- 请使用最新版本 -->
+        </dependency>
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java-transport-httpclient5</artifactId>
+            <version>3.3.4</version> <!-- 请使用最新版本 -->
+        </dependency>
 
+        <dependency>
+            <groupId>org.apache.httpcomponents.core5</groupId>
+            <artifactId>httpcore5</artifactId>
+            <version>5.1</version> <!-- 请检查并使用适合您项目的最新版本 -->
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.core5</groupId>
+            <artifactId>httpcore5-h2</artifactId>
+            <version>5.1</version> <!-- 请检查并使用适合您项目的最新版本 -->
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.4</version>
+        </dependency>
+
+<!--        &lt;!&ndash; JAX-RS API &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>javax.ws.rs</groupId>-->
+<!--            <artifactId>javax.ws.rs-api</artifactId>-->
+<!--            <version>2.1.1</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>javax.annotation</groupId>-->
+<!--            <artifactId>javax.annotation-api</artifactId>-->
+<!--            <version>1.3.2</version>-->
+<!--        </dependency>-->
+
+
+<!--        <dependency>-->
+<!--            <groupId>org.glassfish.jersey.core</groupId>-->
+<!--            <artifactId>jersey-client</artifactId>-->
+<!--            <version>2.31</version> &lt;!&ndash; 使用与docker-java兼容的版本 &ndash;&gt;-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.glassfish.jersey.core</groupId>-->
+<!--            <artifactId>jersey-common</artifactId>-->
+<!--            <version>2.31</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.glassfish.jersey.containers</groupId>-->
+<!--            <artifactId>jersey-container-servlet</artifactId>-->
+<!--            <version>2.31</version>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; HK2 Binding &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.glassfish.jersey.inject</groupId>-->
+<!--            <artifactId>jersey-hk2</artifactId>-->
+<!--            <version>2.31</version> &lt;!&ndash; 确保版本与您的Jersey版本一致 &ndash;&gt;-->
+<!--        </dependency>-->
     </dependencies>
 
     <build>

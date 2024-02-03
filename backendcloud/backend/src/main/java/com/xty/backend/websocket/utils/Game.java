@@ -37,18 +37,20 @@ public class Game extends Thread {
         this.g = new int[rows][cols];
 
         Integer botIdA = -1, botIdB = -1;
-        String botCodeA = "", botCodeB = "";
+        String typeA = "", botCodeA = "", typeB = "", botCodeB = "";
         if (botA != null) {
             botIdA = botA.getId();
+            typeA = botA.getType();
             botCodeA = botA.getContent();
         }
         if (botB != null) {
             botIdB = botB.getId();
+            typeB = botB.getType();
             botCodeB = botB.getContent();
         }
 
-        playerA = new Player(idA, botIdA, botCodeA, rows - 2, 1, new ArrayList<>());
-        playerB = new Player(idB, botIdB, botCodeB, 1, cols - 2, new ArrayList<>());
+        playerA = new Player(idA, botIdA, typeA, botCodeA, rows - 2, 1, new ArrayList<>());
+        playerB = new Player(idB, botIdB, typeB, botCodeB, 1, cols - 2, new ArrayList<>());
     }
 
     public int[][] getG() {
@@ -177,6 +179,7 @@ public class Game extends Thread {
 
         MultiValueMap<String, String> req = new LinkedMultiValueMap<>();
         req.add("user_id", player.getId().toString());
+        req.add("type", player.getType());
         req.add("bot_code", player.getBotCode());
         req.add("input", getInput(player));
 
@@ -188,13 +191,17 @@ public class Game extends Thread {
 
         req.add("user_id", playerA.getId().toString());
         if (playerA.getBotId().equals(-1)) {
+            req.add("type", "");
             req.add("bot_code", "");
             req.add("input", "");
         } else {
+            req.add("type", playerA.getType());
             req.add("bot_code", playerA.getBotCode());
             req.add("input", getInput(playerA));
         }
         req.add("ai_id", playerB.getId().toString());
+        System.out.println("AI的代码类型是: " + playerB.getType());
+        req.add("type2", playerB.getType());
         req.add("ai_bot_code", playerB.getBotCode());
         req.add("input2", getInput(playerB));
 

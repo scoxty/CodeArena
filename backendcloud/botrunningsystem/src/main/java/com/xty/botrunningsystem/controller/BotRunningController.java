@@ -17,19 +17,22 @@ public class BotRunningController {
     @PostMapping("/bot/add")
     public String addBot(@RequestParam MultiValueMap<String, String> req) {
         Integer userId = Integer.parseInt(Objects.requireNonNull(req.getFirst("user_id")));
+        String type = req.getFirst("type");
         String botCode = req.getFirst("bot_code");
         String input = req.getFirst("input");
-        return botRunningService.addBot(userId, botCode, input);
+        return botRunningService.addBot(userId, type, botCode, input);
     }
 
     @PostMapping("/botWithAI/add")
     public String addBotWithAI(@RequestParam MultiValueMap<String, String> req) {
         Integer userId = Integer.parseInt(Objects.requireNonNull(req.getFirst("user_id")));
+        String type = req.getFirst("type");
         String botCode = req.getFirst("bot_code");
         String input = req.getFirst("input");
         Integer aiId = Integer.parseInt(Objects.requireNonNull(req.getFirst("ai_id")));
+        String type2 = req.getFirst("type2");
         String aiBotCode = req.getFirst("ai_bot_code");
         String input2 = req.getFirst("input2");
-        return botRunningService.addBotWithAI(userId, botCode, input, aiId, aiBotCode, input2);
+        return botRunningService.addBotWithAI(userId, type, botCode, input, aiId, type2, aiBotCode, input2);
     }
 }
