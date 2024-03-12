@@ -88,13 +88,8 @@ public class Code {
     }
 
     public static void main(String[] args) {
-        File file = new File("/botrunning/input.txt");
-        try {
-            Scanner sc = new Scanner(file);
-            System.out.println(nextMove(sc.next()));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        Scanner sc = new Scanner(System.in);
+        System.out.println(nextMove(sc.next()));
     }
 }
 
@@ -157,13 +152,8 @@ public class Code {
     }
 
     public static void main(String[] args) {
-        File file = new File("/botrunning/input.txt");
-        try {
-            Scanner scanner = new Scanner(file);
-            System.out.println(nextMove(scanner.next()));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        Scanner sc = new Scanner(System.in);
+        System.out.println(nextMove(sc.next()));
     }
 
     public static Integer nextMove(String input) {
@@ -362,13 +352,8 @@ public class Code {
     }
 
     public static void main(String[] args) {
-        File file = new File("/botrunning/input.txt");
-        try {
-            Scanner sc = new Scanner(file);
-            System.out.println(nextMove(sc.next()));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        Scanner sc = new Scanner(System.in);
+        System.out.println(nextMove(sc.next()));
     }
 }
 ```
@@ -429,13 +414,8 @@ public class Code {
     }
 
     public static void main(String[] args) {
-        File file = new File("/botrunning/input.txt");
-        try {
-            Scanner sc = new Scanner(file);
-            System.out.println(nextMove(sc.next()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Scanner sc = new Scanner(System.in);
+        System.out.println(nextMove(sc.next()));
     }
 
     // 地图#自己起始横坐标#自己起始纵坐标#(自己操作)#对手起始横坐标#对手起始纵坐标#(对手操作)
