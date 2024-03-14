@@ -13,9 +13,9 @@ public class BotQueueThreadPoolConfig {
     public ThreadPoolExecutor botQueueExecutor() {
         return new ThreadPoolExecutor(
                 Runtime.getRuntime().availableProcessors(),
-                Runtime.getRuntime().availableProcessors() + 1,
-                10L, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(100),
+                Runtime.getRuntime().availableProcessors() * 2,
+                60L, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(200),
                 new ThreadPoolExecutor.CallerRunsPolicy());
     }
 }

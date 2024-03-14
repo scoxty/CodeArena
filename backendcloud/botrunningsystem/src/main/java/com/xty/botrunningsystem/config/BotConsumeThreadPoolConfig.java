@@ -12,10 +12,10 @@ public class BotConsumeThreadPoolConfig {
     @Bean
     public ThreadPoolExecutor botConsumeExecutor() {
         return new ThreadPoolExecutor(
-                4,
-                10,
-                10L, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(100),
+                Runtime.getRuntime().availableProcessors(),
+                Runtime.getRuntime().availableProcessors() * 2,
+                60L, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(200),
                 new ThreadPoolExecutor.CallerRunsPolicy());
     }
 }

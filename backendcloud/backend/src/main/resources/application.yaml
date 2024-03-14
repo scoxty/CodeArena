@@ -15,12 +15,12 @@ spring:
           max-idle: 8
           min-idle: 0
           max-wait: -1
-        host: 略
-      password: 略
+        host: 8.134.107.55
+      password: .Xty510521
   datasource:
     url: jdbc:mysql:///codearena
-    username: 略
-    password: 略
+    username: root
+    password: .Xty510521
     driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
     time-zone: GMT+8
@@ -31,5 +31,5 @@ mybatis-plus:
   type-aliases-package: com.xty.backend
   global-config:
     db-config:
-#      logic-delete-field: isDeleted  #全局逻辑删除
+      #      logic-delete-field: isDeleted  #全局逻辑删除
       id-type: auto #主键策略自增长
