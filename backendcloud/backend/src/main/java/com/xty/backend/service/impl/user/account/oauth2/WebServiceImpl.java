@@ -26,8 +26,8 @@ public class WebServiceImpl implements WebService {
     private static final String appSecret = "RmunSt53g5F9oDNH";
     private static final String redirectUri = "https://www.scoxty.com/user/account/qq/web/receive_code";
     private static final String applyAccessTokenUrl = "https://graph.qq.com/oauth2.0/token";
-    private static final String getUserInfoUrl = "https://graph.qq.com/user/get_user_info";
     private static final String getUserOpenIDUrl="https://graph.qq.com/oauth2.0/me";
+    private static final String getUserInfoUrl = "https://graph.qq.com/user/get_user_info";
     private final static Random random = new Random();
 
     @Autowired
@@ -110,10 +110,12 @@ public class WebServiceImpl implements WebService {
         if (!users.isEmpty()) {
             User user = users.get(0);
             //生成JWT
-            String jwt = JwtUtil.createJWT(user.getId().toString());
+            String jwtToken = JwtUtil.createAccessToken(user.getId().toString());
+            String jwtRefreshToken = JwtUtil.createRefreshToken(user.getId().toString());
 
             resp.put("result", "success");
-            resp.put("jwt_token", jwt);
+            resp.put("jwt_token", jwtToken);
+            resp.put("jwt_refresh_token", jwtRefreshToken);
             return resp;
         }
 
@@ -150,9 +152,12 @@ public class WebServiceImpl implements WebService {
         userMapper.insert(user);
 
         //生成JWT
-        String jwt = JwtUtil.createJWT(user.getId().toString());
+        String jwtToken = JwtUtil.createAccessToken(user.getId().toString());
+        String jwtRefreshToken = JwtUtil.createRefreshToken(user.getId().toString());
+
         resp.put("result", "success");
-        resp.put("jwt_token", jwt);
+        resp.put("jwt_token", jwtToken);
+        resp.put("jwt_refresh_token", jwtRefreshToken);
         return resp;
     }
 }

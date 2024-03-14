@@ -91,9 +91,9 @@ public class MatchingPool {
                     int waitSecond = (int)((now-oldest.getStartMatchTime())/1000);
 
                     //按等待时间扩大匹配范围
-                    float c2 = 1.5f;
-                    int c3 = 5;
-                    int c4 = 1000;
+                    float c2 = 1.5f; // 增长指数，旨在随着等待时间的增加快速扩大匹配范围
+                    int c3 = 5; // 基础匹配半径，使得刚进来的玩家也能参与匹配
+                    int c4 = 1000; // 最大匹配半径
 
                     float u = (float) Math.pow(waitSecond, c2);
                     u = u + c3;

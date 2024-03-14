@@ -14,15 +14,24 @@ import java.util.UUID;
 
 @Component
 public class JwtUtil {
-    public static final long JWT_TTL = 60 * 60 * 1000L * 24 * 14;  // 有效期14天, 单位毫秒
+    private static final long ACCESS_TOKEN_TTL = 24 * 60 * 60 * 1000L; // 1天
+    private static final long REFRESH_TOKEN_TTL = 60 * 60 * 1000L * 24 * 7; // 7天
     public static final String JWT_KEY = "SDFGjhdsfalshdfHFdsjkdsfds121232131afasdfac";
 
     public static String getUUID() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
-    public static String createJWT(String subject) {
-        JwtBuilder builder = getJwtBuilder(subject, null, getUUID());
+    public static String createAccessToken(String subject) {
+        return createJWT(subject, ACCESS_TOKEN_TTL);
+    }
+
+    public static String createRefreshToken(String subject) {
+        return createJWT(subject, REFRESH_TOKEN_TTL);
+    }
+
+    public static String createJWT(String subject, long ttl) {
+        JwtBuilder builder = getJwtBuilder(subject, ttl, getUUID());
         return builder.compact();
     }
 
@@ -31,9 +40,6 @@ public class JwtUtil {
         SecretKey secretKey = generalKey();
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
-        if (ttlMillis == null) {
-            ttlMillis = JwtUtil.JWT_TTL;
-        }
 
         long expMillis = nowMillis + ttlMillis;
         Date expDate = new Date(expMillis);

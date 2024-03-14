@@ -42,8 +42,10 @@ export default {
         let error_msg = ref('');
 
         const jwt_token = localStorage.getItem("jwt_token");
-        if (jwt_token != "") {
+        const jwt_refresh_token = localStorage.getItem("jwt_refresh_token");
+        if (jwt_token != "" && jwt_refresh_token != "") {
             store.commit("updateToken", jwt_token);
+            store.commit("updateRefreshToken", jwt_refresh_token);
             store.dispatch("getinfo", {
                 success() {
                     router.push({ name: "home" });

@@ -1,8 +1,10 @@
 package com.xty.botrunningsystem.service.impl.utils;
 
 import com.xty.botrunningsystem.service.impl.utils.sandbox.CodeExecutionStrategy;
+import jakarta.annotation.PreDestroy;
 import org.joor.Reflect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -15,10 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.function.Supplier;
 
 @Component
@@ -31,32 +30,28 @@ public class Consumer {
     private ApplicationContext applicationContext; // 用于获取策略实现
 
     @Autowired
+    private ThreadPoolExecutor sandboxExecutor; // 用于管理代码沙箱线程的线程池
+
+    @Autowired
+    private ThreadPoolExecutor botConsumeExecutor; // 用于管理bot消费端线程
+
+    @Autowired
     public void setRestTemplate(RestTemplate restTemplate) {
         Consumer.restTemplate = restTemplate;
     }
 
-    public void startTimeOut(long timeout, Bot bot) {
-        CompletableFuture<Void> future = processBotAsync(bot);
-        try {
-            future.get(timeout, TimeUnit.MILLISECONDS); // 等待直到异步任务完成或超时
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            future.cancel(true); // 如果发生超时或中断，取消异步任务
-            e.printStackTrace();
-        }
+    public void consumeBot(Bot bot) {
+        botConsumeExecutor.submit(()->{
+            runBotCode(bot);
+        });
     }
 
-    @Async
-    public CompletableFuture<Void> processBotAsync(Bot bot) {
-        try {
-            if (bot.getAiId() == null) {
-                consumeWithoutAI(bot);
-            } else {
-                consumeWithAI(bot);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void runBotCode(Bot bot) {
+        if (bot.getAiId() == null) {
+            consumeWithoutAI(bot);
+        } else {
+            consumeWithAI(bot);
         }
-        return CompletableFuture.completedFuture(null);
     }
 
     private void consumeWithoutAI(Bot bot) {
@@ -64,8 +59,10 @@ public class Consumer {
         String language = bot.getType();
         CodeExecutionStrategy strategy = applicationContext.getBean(language + "ExecutionStrategy", CodeExecutionStrategy.class);
 
-        Integer direction = strategy.executeCode(bot.getBotCode(), bot.getInput());
-
+        long pre = System.currentTimeMillis();
+        Integer direction = strategy.executeCode(bot.getUserId(), bot.getBotCode(), bot.getInput());
+        long now = System.currentTimeMillis();
+        System.out.println("docker代码沙箱的总执行时间: " + (now - pre) + "ms");
         System.out.println("move-direction: " + bot.getUserId() + " " + direction);
 
         MultiValueMap<String, String> req = new LinkedMultiValueMap<>();
@@ -76,23 +73,28 @@ public class Consumer {
     }
 
     private void consumeWithAI(Bot bot) {
+        long last = System.currentTimeMillis();
+
         // 用户的代码放到docker执行
-        CompletableFuture<Integer> playerDirectionFuture = CompletableFuture.supplyAsync(() -> {
+        Future<Integer> playerDirectionFuture = botConsumeExecutor.submit(() -> {
             if (!Objects.equals(bot.getBotCode(), "")) { // 玩家的Bot参战
                 CodeExecutionStrategy strategy = applicationContext.getBean(bot.getType() + "ExecutionStrategy", CodeExecutionStrategy.class);
-                return strategy.executeCode(bot.getBotCode(), bot.getInput());
+                return strategy.executeCode(bot.getUserId(), bot.getBotCode(), bot.getInput());
             }
             return -1; // 如果玩家自己参战，则返回-1
         });
 
         // 人机的代码默认Java且信任度较高，直接使用joor动态编译执行
-        CompletableFuture<Integer> aiDirectionFuture = CompletableFuture.supplyAsync(() -> compileAndExecuteCode(bot.getAiBotCode(), bot.getInput2()));
-
-        CompletableFuture.allOf(playerDirectionFuture, aiDirectionFuture).join(); // 等待所有的Future完成
+        Future<Integer> aiDirectionFuture = botConsumeExecutor.submit(() -> compileAndExecuteCode(bot.getAiBotCode(), bot.getInput2()));
 
         // 获取Future的结果
-        Integer directionA = playerDirectionFuture.join();
-        Integer directionB = aiDirectionFuture.join();
+        Integer directionA = null, directionB = null;
+        try {
+            directionA = playerDirectionFuture.get();
+            directionB = aiDirectionFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
 
         if (!Objects.equals(bot.getBotCode(), "")) {
             System.out.println("id为:" + bot.getUserId() + "的用户的move-direction: " + directionA);
@@ -105,9 +107,13 @@ public class Consumer {
         req.add("user_id_b", bot.getAiId().toString());
         req.add("direction_b", directionB.toString());
 
+        long now = System.currentTimeMillis();
+        System.out.println("用户+AI代码执行总耗时: " + (now - last) + "ms");
+
         restTemplate.postForObject(receiveBotMoveWithAIUrl, req, String.class);
     }
 
+    // 由于AI有服务端提供，是可信任的并且是Java代码，因此直接使用supplier编译
     private Integer compileAndExecuteCode(String botCode, String input) {
         // 编译执行AI的代码：
         UUID uuid = UUID.randomUUID();
@@ -135,4 +141,21 @@ public class Consumer {
         return code.substring(0, k) + uid + code.substring(k);
     }
 
+    @PreDestroy
+    public void destroy() {
+        // 清理线程池资源
+        shutdownAndAwaitTermination(botConsumeExecutor);
+        shutdownAndAwaitTermination(sandboxExecutor);
+    }
+
+    private void shutdownAndAwaitTermination(ThreadPoolExecutor pool) {
+        pool.shutdown();
+        try {
+            if (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
+                pool.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            pool.shutdownNow();
+        }
+    }
 }

@@ -2,15 +2,23 @@ package com.xty.botrunningsystem.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Bot implements java.util.function.Supplier<Integer> {
+public class Bot {
+    public static void main(String[] args) {
+        long last = new Date().getTime();
+        Integer integer = get();
+        System.out.println(integer);
+        long now = new Date().getTime();
+        System.out.println("耗时: " + (now - last) + "ms");
+    }
 
-    @Override
-    public Integer get() {
-        File file = new File("input.txt");
+    public static Integer get() {
+
+        File file = new File("AI_Input.txt");
         try {
             Scanner sc = new Scanner(file);
             return nextMove(sc.next());
@@ -65,7 +73,7 @@ public class Bot implements java.util.function.Supplier<Integer> {
     }
 
     // 地图#自己起始横坐标#自己起始纵坐标#(自己操作)#对手起始横坐标#对手起始纵坐标#(对手操作)
-    public Integer nextMove(String input) {
+    public static Integer nextMove(String input) {
         String[] strs = input.split("#");    // (#拼接)   棋盘(0/1)#a玩家起始x坐标#a玩家起始y坐标   // 对于棋盘来说,只有可走不可走(0/1)
         int[][] g = new int[13][14];    // 棋盘中 0:可走位置 1:不可走位置
         // 棋盘 13 * 14
@@ -75,13 +83,6 @@ public class Bot implements java.util.function.Supplier<Integer> {
                     g[i][j] = 1;
                 }
             }
-        }
-
-        for (int i = 0; i < 13; i ++) {
-            for (int j = 0; j < 14; j ++) {
-                System.out.print(g[i][j] + " ");
-            }
-            System.out.println();
         }
 
         // 起始坐标
@@ -105,13 +106,14 @@ public class Bot implements java.util.function.Supplier<Integer> {
         if (moveNumber == 0) { // 0种 表示已经输, 特殊处理, 无需minmax, 随便返回一个方向即可
             return 0;
         }
-        if (moveNumber == 1)  // 1种 只能这样走, 特殊处理, 无需minmax, 返回此时能走的方向
+        if (moveNumber == 1) { // 1种 只能这样走, 特殊处理, 无需minmax, 返回此时能走的方向
             for (int i = 0; i < 4; i++) {
                 int x = aCells.get(aCells.size() - 1).x + dx[i];
                 int y = aCells.get(aCells.size() - 1).y + dy[i];
                 if (isMove(g, x, y))
                     return i;
             }
+        }
 
         int depth = DEPTH; // 深度
         max(g, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
@@ -235,7 +237,7 @@ public class Bot implements java.util.function.Supplier<Integer> {
     // 计算分数 评估函数( 层数 * 可移动方向数量)             自己的信息       对手的信息
     public static int checkScore(int[][] g, List<Cell> playerCells, List<Cell> foe, int depth) {
         // 失败  玩家四个方法无法移动, 失败的情况归属到一般情况中  <= 11
-        if (moveNumber(g, playerCells) == 0) return (DEPTH - depth + 1) * 1;
+        if (moveNumber(g, playerCells) == 0) return (DEPTH - depth + 1);
 
         // 返回当前位置可走步数 (小分数)    扩大可走位置的倍数
         return (DEPTH - depth + 1) * (int) (Math.pow(moveNumber(g, playerCells) + 1, 2)) + 11;

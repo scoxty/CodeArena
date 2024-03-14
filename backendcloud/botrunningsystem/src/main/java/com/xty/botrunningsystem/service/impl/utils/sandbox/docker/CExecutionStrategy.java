@@ -13,31 +13,36 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @Component("CExecutionStrategy")
 public class CExecutionStrategy implements CodeExecutionStrategy {
-    private static final String IMAGE = "gcc:latest";
+    private static final String IMAGE = "c-sandbox:latest";
 
     @Autowired
     private final DockerClient dockerClient;
+
+    @Autowired
+    private ThreadPoolExecutor sandboxExecutor;
 
     public CExecutionStrategy(DockerClient dockerClient) {
         this.dockerClient = dockerClient;
     }
 
     @Override
-    public Integer executeCode(String code, String input) {
+    public Integer executeCode(Integer userId, String code, String input) {
         try {
-            Path codePath = Paths.get("/home/xty/codearena/backendcloud/botrunning/c/Code.c");
-            Path inputPath = Paths.get("/home/xty/codearena/backendcloud/botrunning/input.txt");
-            Files.writeString(codePath, code);
-            Files.writeString(inputPath, input);
-
             String containerId = createAndStartContainer();
 
-            Integer result = executeCCodeInContainer(containerId);
+            Integer result = executeCCodeInContainer(containerId, code, input);
 
-            dockerClient.removeContainerCmd(containerId).withForce(true).exec();
+            sandboxExecutor.submit(()->{
+                dockerClient.removeContainerCmd(containerId).withForce(true).exec();
+            });
 
             return result;
         } catch (Exception e) {
@@ -48,20 +53,18 @@ public class CExecutionStrategy implements CodeExecutionStrategy {
 
     private String createAndStartContainer() {
         HostConfig hostConfig = new HostConfig();
-        Bind bind = new Bind("/home/xty/codearena/backendcloud/botrunning", new Volume("/botrunning"));
-        hostConfig.setBinds(bind);
-        hostConfig.withMemory(200 * 1000 * 1000L);
-        hostConfig.withMemorySwap(0L);
-        hostConfig.withCpuCount(1L);
+        hostConfig.withMemory(200 * 1000 *1000L); // 限制内存200MB
+        hostConfig.withMemorySwap(0L); // 禁止使用交换空间，防止容器过度使用硬盘空间作为虚拟内存
+        hostConfig.withCpuCount(1L); // 限制cpu为1核
 
         CreateContainerResponse container = dockerClient.createContainerCmd(IMAGE)
                 .withHostConfig(hostConfig)
                 .withAttachStdin(true)
                 .withAttachStderr(true)
                 .withAttachStdout(true)
-                .withNetworkDisabled(true)
+                .withNetworkDisabled(true) // 禁用网络
                 .withTty(true)
-                .withCmd("tail", "-f", "/dev/null")
+                .withCmd("tail", "-f", "/dev/null") // 保持容器运行
                 .exec();
 
         dockerClient.startContainerCmd(container.getId()).exec();
@@ -69,26 +72,18 @@ public class CExecutionStrategy implements CodeExecutionStrategy {
         return container.getId();
     }
 
-    private Integer executeCCodeInContainer(String containerId) {
-        // 编译 C 代码
-        ExecCreateCmdResponse compileResponse = dockerClient.execCreateCmd(containerId)
-                .withCmd("gcc", "/botrunning/c/Code.c", "-o", "/botrunning/c/Code")
-                .withAttachStdin(true)
-                .withAttachStderr(true)
-                .withAttachStdout(true)
-                .exec();
-        try {
-            MyExecStartResultCallback compileResultCallback = new MyExecStartResultCallback();
-            dockerClient.execStartCmd(compileResponse.getId()).exec(compileResultCallback);
-            compileResultCallback.awaitCompletion();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    private Integer executeCCodeInContainer(String containerId, String code, String input) {
+        String codeBase64 = Base64.getEncoder().encodeToString(code.getBytes());
+        String inputBase64 =  Base64.getEncoder().encodeToString(input.getBytes());
 
-        // 执行编译后的 C 程序
+        String command = String.format("/bin/sh -c \"echo '%s' | base64 -d > /sandbox/Code.c && " +
+                "echo '%s' | base64 -d > /sandbox/input.txt && " +
+                "gcc /sandbox/Code.c -o /sandbox/Code && " +
+                "/sandbox/Code < /sandbox/input.txt\"", codeBase64, inputBase64);
+
         ExecCreateCmdResponse execResponse = dockerClient.execCreateCmd(containerId)
-                .withCmd("/botrunning/c/Code")
-                .withAttachStdin(true)
+                .withCmd("sh", "-c", command)
+                .withAttachStdin(false)
                 .withAttachStderr(true)
                 .withAttachStdout(true)
                 .exec();

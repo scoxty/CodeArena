@@ -27,10 +27,6 @@ public class RegisterServiceImpl implements RegisterService {
     @Autowired
     private BotMapper botMapper;
 
-    public static User AI = null;
-    public static List<Bot> AIBots = null;
-
-
     @Override
     public Map<String, String> register(String username, String password, String confirmedPassword) {
         Map<String, String> resp = new HashMap<>();

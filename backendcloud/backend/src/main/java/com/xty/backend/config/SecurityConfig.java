@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers(
                                 "/api/user/account/token",
+                                "/api/user/account/refresh_token",
                                 "/api/user/account/register",
                                 "/pk/start/game",
                                 "/pkWithAI/start/game",

@@ -27,10 +27,13 @@ public class LoginServiceImpl implements LoginService {
         Authentication authenticate = authenticationManager.authenticate(authenticationToken); // 登陆失败，会自动处理
         UserDetailsImpl loginUser = (UserDetailsImpl) authenticate.getPrincipal();
         User user = loginUser.getUser();
-        String jwt = JwtUtil.createJWT(user.getId().toString());
+        String accessToken = JwtUtil.createAccessToken(user.getId().toString());
+        String refreshToken = JwtUtil.createRefreshToken(user.getId().toString());
+
         Map<String, String> resp = new HashMap<>();
         resp.put("error_msg", "success");
-        resp.put("token", jwt);
+        resp.put("token", accessToken);
+        resp.put("refresh_token", refreshToken);
         return resp;
     }
 }

@@ -23,7 +23,9 @@ export default {
             success: resp => {
                 if (resp.result === "success") {
                     localStorage.setItem("jwt_token", resp.jwt_token);
+                    localStorage.setItem("jwt_refresh_token", resp.jwt_refresh_token);
                     store.commit("updateToken", resp.jwt_token);
+                    store.commit("updateRefreshToken", resp.jwt_refresh_token);
                     router.push({ name: "home" });
                     store.commit("updatePullingInfo", false);
                 } else {

@@ -3,41 +3,42 @@ package com.xty.botrunningsystem.service.impl.utils.sandbox.docker;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.ExecCreateCmdResponse;
-import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.HostConfig;
-import com.github.dockerjava.api.model.Volume;
+import com.github.dockerjava.core.command.ExecStartResultCallback;
 import com.xty.botrunningsystem.service.impl.utils.sandbox.CodeExecutionStrategy;
+import jakarta.annotation.PreDestroy;
+import org.bouncycastle.util.encoders.UTF8;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Base64;
+import java.util.concurrent.*;
+
 
 @Component("JavaExecutionStrategy")
 public class JavaExecutionStrategy implements CodeExecutionStrategy {
-    private static final String IMAGE = "openjdk:11-jdk"; // 提前下载好
+    private static final String IMAGE = "java-sandbox:latest";
 
     @Autowired
     private final DockerClient dockerClient;
+
+    @Autowired
+    private ThreadPoolExecutor sandboxExecutor;
 
     public JavaExecutionStrategy(DockerClient dockerClient) {
         this.dockerClient = dockerClient;
     }
 
     @Override
-    public Integer executeCode(String code, String input) {
+    public Integer executeCode(Integer userId, String code, String input) {
         try {
-            Path codePath = Paths.get("/home/xty/codearena/backendcloud/botrunning/java/Code.java");
-            Path inputPath = Paths.get("/home/xty/codearena/backendcloud/botrunning/input.txt");
-            Files.writeString(codePath, code);
-            Files.writeString(inputPath, input);
-
             String containerId = createAndStartContainer();
 
-            Integer result = executeJavaCodeInContainer(containerId);
+            Integer result = executeJavaCodeInContainer(containerId, code, input);
 
-            dockerClient.removeContainerCmd(containerId).withForce(true).exec();
+            sandboxExecutor.submit(()->{
+                dockerClient.removeContainerCmd(containerId).withForce(true).exec();
+            });
 
             return result;
         } catch (Exception e) {
@@ -48,8 +49,6 @@ public class JavaExecutionStrategy implements CodeExecutionStrategy {
 
     private String createAndStartContainer() {
         HostConfig hostConfig = new HostConfig();
-        Bind bind = new Bind("/home/xty/codearena/backendcloud/botrunning",new Volume("/botrunning"));
-        hostConfig.setBinds(bind);
         hostConfig.withMemory(200 * 1000 *1000L); // 限制内存200MB
         hostConfig.withMemorySwap(0L); // 禁止使用交换空间，防止容器过度使用硬盘空间作为虚拟内存
         hostConfig.withCpuCount(1L); // 限制cpu为1核
@@ -59,7 +58,7 @@ public class JavaExecutionStrategy implements CodeExecutionStrategy {
                 .withAttachStdin(true)
                 .withAttachStderr(true)
                 .withAttachStdout(true)
-                .withNetworkDisabled(true)
+                .withNetworkDisabled(true) // 禁用网络
                 .withTty(true)
                 .withCmd("tail", "-f", "/dev/null") // 保持容器运行
                 .exec();
@@ -69,26 +68,19 @@ public class JavaExecutionStrategy implements CodeExecutionStrategy {
         return container.getId();
     }
 
-    private Integer executeJavaCodeInContainer(String containerId) {
-        // 编译Java代码
-        ExecCreateCmdResponse compileResponse = dockerClient.execCreateCmd(containerId)
-                .withCmd("javac", "/botrunning/java/Code.java")
-                .withAttachStdin(true)
-                .withAttachStderr(true)
-                .withAttachStdout(true)
-                .exec();
-        try {
-            MyExecStartResultCallback compileResultCallback = new MyExecStartResultCallback();
-            dockerClient.execStartCmd(compileResponse.getId()).exec(compileResultCallback);
-            compileResultCallback.awaitCompletion();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    private Integer executeJavaCodeInContainer(String containerId, String code, String input) {
+        String codeBase64 = Base64.getEncoder().encodeToString(code.getBytes());
+        String inputBase64 =  Base64.getEncoder().encodeToString(input.getBytes());
 
-        // 执行Java代码并捕获标准输出
+        // 构建一个命令，先写入Code.java和input.txt，然后编译Code.java，并将input.txt的内容作为参数传递给编译后的程序
+        String command = String.format("/bin/sh -c \"echo '%s' | base64 -d > /sandbox/Code.java && " +
+                "echo '%s' | base64 -d > /sandbox/input.txt && " +
+                "javac /sandbox/Code.java && " +
+                "java -cp /sandbox Code < /sandbox/input.txt\"", codeBase64, inputBase64);
+
         ExecCreateCmdResponse execResponse = dockerClient.execCreateCmd(containerId)
-                .withCmd("java", "-cp", "/botrunning/java", "Code")
-                .withAttachStdin(true)
+                .withCmd("sh", "-c", command)
+                .withAttachStdin(false)
                 .withAttachStderr(true)
                 .withAttachStdout(true)
                 .exec();
