@@ -2,7 +2,7 @@
 CodeArena是一款在线程序对抗平台。主要功能包括注册、登录、自动匹配、在线对战、对战记录、比赛回放及积分排行榜。支持多种对战模式（人人、人机、机器间）。
 
 # 项目网址:
-https://www.scoxty.com/pk (已下线)
+https://www.scoxty.com/pk
 # 测试用户:
 账号: test
 
