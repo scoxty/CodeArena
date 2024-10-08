@@ -14,7 +14,7 @@ public class GetListController {
     @Autowired
     private GetListService getListService;
 
-    @GetMapping("/api/user/bot/getlist")
+    @GetMapping("/codearena/api/user/bot/getlist")
     public List<Bot> getList() {
         return getListService.getList();
     }

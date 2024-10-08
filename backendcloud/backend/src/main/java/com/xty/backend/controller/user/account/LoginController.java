@@ -17,14 +17,14 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
-    @PostMapping("/api/user/account/token")
+    @PostMapping("/codearena/api/user/account/token")
     public Map<String, String> login(@RequestParam Map<String, String> req) {
         String username = req.get("username");
         String password = req.get("password");
         return loginService.login(username, password);
     }
 
-    @PostMapping("/api/user/account/refresh_token")
+    @PostMapping("/codearena/api/user/account/refresh_token")
     public Map<String, String> refreshToken(@RequestParam Map<String, String> req) {
         String refreshToken = req.get("refresh_token");
         String userId;

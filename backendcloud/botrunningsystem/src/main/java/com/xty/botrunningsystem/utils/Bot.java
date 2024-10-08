@@ -7,18 +7,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Bot {
-    public static void main(String[] args) {
-        long last = new Date().getTime();
-        Integer integer = get();
-        System.out.println(integer);
-        long now = new Date().getTime();
-        System.out.println("耗时: " + (now - last) + "ms");
-    }
+public class Bot implements BotInterface {
+//    public static void main(String[] args) {
+//        long last = new Date().getTime();
+//        Integer integer = get();
+//        System.out.println(integer);
+//        long now = new Date().getTime();
+//        System.out.println("耗时: " + (now - last) + "ms");
+//    }
 
-    public static Integer get() {
+    public Integer get() {
+        File file = new File("./input.txt");
 
-        File file = new File("AI_Input.txt");
+//        File file = new File("AI_Input.txt");
         try {
             Scanner sc = new Scanner(file);
             return nextMove(sc.next());
@@ -72,8 +73,9 @@ public class Bot {
         return res;
     }
 
+    @Override
     // 地图#自己起始横坐标#自己起始纵坐标#(自己操作)#对手起始横坐标#对手起始纵坐标#(对手操作)
-    public static Integer nextMove(String input) {
+    public Integer nextMove(String input) {
         String[] strs = input.split("#");    // (#拼接)   棋盘(0/1)#a玩家起始x坐标#a玩家起始y坐标   // 对于棋盘来说,只有可走不可走(0/1)
         int[][] g = new int[13][14];    // 棋盘中 0:可走位置 1:不可走位置
         // 棋盘 13 * 14

@@ -14,7 +14,7 @@ public class AddController {
     @Autowired
     private AddService addService;
 
-    @PostMapping("/api/user/bot/add")
+    @PostMapping("/codearena/api/user/bot/add")
     public Map<String, String> add(@RequestParam Map<String, String> req) {
         return addService.add(req);
     }

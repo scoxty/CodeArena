@@ -22,9 +22,9 @@ import java.util.Random;
 
 @Service
 public class WebServiceImpl implements WebService {
-    private static final String appId = "你的appID";
-    private static final String appSecret = "你的appSecret";
-    private static final String redirectUri = "https://www.scoxty.com/user/account/qq/web/receive_code";
+    private static final String appId = "102091794";
+    private static final String appSecret = "RmunSt53g5F9oDNH";
+    private static final String redirectUri = "https://www.scoxty.com/codearena/user/account/qq/web/receive_code";
     private static final String applyAccessTokenUrl = "https://graph.qq.com/oauth2.0/token";
     private static final String getUserOpenIDUrl="https://graph.qq.com/oauth2.0/me";
     private static final String getUserInfoUrl = "https://graph.qq.com/user/get_user_info";

@@ -43,15 +43,15 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 基于token，不需要session
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers(
-                                "/api/user/account/token",
-                                "/api/user/account/refresh_token",
-                                "/api/user/account/register",
+                                "/codearena/api/user/account/token",
+                                "/codearena/api/user/account/refresh_token",
+                                "/codearena/api/user/account/register",
                                 "/pk/start/game",
                                 "/pkWithAI/start/game",
                                 "/pk/receive/bot/move",
                                 "/pkWithAI/receive/bot/move",
-                                "/api/user/account/qq/web/apply_code",
-                                "/api/user/account/qq/web/receive_code"
+                                "/codearena/api/user/account/qq/web/apply_code",
+                                "/codearena/api/user/account/qq/web/receive_code"
                                 ).permitAll() // 放行api
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyRequest().authenticated()
@@ -64,6 +64,6 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/websocket/**");
+        return (web) -> web.ignoring().requestMatchers("/codearena/websocket/**");
     }
 }

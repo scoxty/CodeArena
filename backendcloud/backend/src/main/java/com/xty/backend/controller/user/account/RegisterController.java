@@ -15,7 +15,7 @@ public class RegisterController {
     @Autowired
     private RegisterService registerService;
 
-    @PostMapping("/api/user/account/register")
+    @PostMapping("/codearena/api/user/account/register")
     public Map<String, String> register(@RequestParam Map<String, String> req) {
         String username = req.get("username");
         String password = req.get("password");

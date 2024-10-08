@@ -15,7 +15,7 @@ public class RemoveController {
     @Autowired
     private RemoveService removeService;
 
-    @PostMapping("/api/user/bot/remove")
+    @PostMapping("/codearena/api/user/bot/remove")
     public Map<String, String> remove(@RequestParam Map<String, String> req) {
         return removeService.remove(req);
     }

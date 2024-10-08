@@ -3,7 +3,6 @@ package com.xty.backend.websocket;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.xty.backend.service.impl.user.account.RegisterServiceImpl;
 import com.xty.backend.websocket.utils.Game;
 import com.xty.backend.websocket.utils.GameDTO;
 import com.xty.backend.websocket.utils.JwtAuthentication;
@@ -24,7 +23,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -33,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
-@ServerEndpoint("/websocket/{token}")  // 注意不要以'/'结尾
+@ServerEndpoint("/codearena/websocket/{token}")  // 注意不要以'/'结尾
 public class WebSocketServer {
     public final static ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>(); // 将前端建立的每个websocket连接在后端维护起来,对所有实例可见
     private Session session = null; // 维护连接

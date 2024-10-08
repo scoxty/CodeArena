@@ -14,7 +14,7 @@ public class UpdateController {
     @Autowired
     private UpdateService updateService;
 
-    @PostMapping("/api/user/bot/update")
+    @PostMapping("/codearena/api/user/bot/update")
     public Map<String, String> update(@RequestParam Map<String, String> req) {
         return updateService.update(req);
     }
