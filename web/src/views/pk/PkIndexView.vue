@@ -27,9 +27,10 @@ export default {
     },
     setup() {
         const store = useStore();
-        const socketUrl = `wss://www.scoxty.com/websocket/${store.state.user.token}`;
+        const socketUrl = `wss://www.scoxty.com/codearena/websocket/${store.state.user.token}`;
         let socket = null;
         // 心跳检测机制以及断线重连机制
+        let heartbeatfail = 0; // 心跳检测失败次数
         let heartbeatInterval = null; // 发送心跳包周期函数
         let heartbeatTimeout = null; // 心跳超时检测
         let shouldReconnect = false; // 心跳检测失败时重连
@@ -69,6 +70,7 @@ export default {
                 const data = JSON.parse(msg.data);
 
                 if (data.event === "pong") {
+                    heartbeatfail = 0;
                     clearTimeout(heartbeatTimeout); // 如果收到服务端的心跳回复则清除计时器
                     if (shouldSynchronize) { // 重连并确保双方能正常通信，则尝试恢复数据
                         socket.send(synchronizeMsg);
@@ -138,10 +140,13 @@ export default {
         function setHeartbeatTimeout() {
             clearTimeout(heartbeatTimeout);
             heartbeatTimeout = setTimeout(() => {
-                console.log("Heartbeat timeout. Closing socket to trigger reconnect.");
-                // 触发重连
-                shouldReconnect = true;
-                socket.close();
+                heartbeatfail++;
+                if (heartbeatfail >= 3) {
+                    console.log("Heartbeat timeout. Closing socket to trigger reconnect.");
+                    // 触发重连
+                    shouldReconnect = true;
+                    socket.close();
+                }
             }, 5000); // 5秒内没收到服务端的心跳响应则触发重连
         }
 

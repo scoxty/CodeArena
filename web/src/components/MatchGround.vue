@@ -29,7 +29,7 @@
             </div>
             <div class="col-12 button">
                 <button type="button" class="btn btn-secondary btn-lg" @click="click_match_btn">{{ match_btn_info
-                }}</button>
+                    }}</button>
             </div>
             <div class="col-12 loaing-board">
                 <div>
@@ -62,7 +62,7 @@ export default {
 
         const refresh_bots = () => {
             $.ajax({
-                url: "https://www.scoxty.com/api/user/bot/getlist",
+                url: "https://www.scoxty.com/codearena/api/user/bot/getlist",
                 type: "get",
                 headers: {
                     Authorization: "Bearer " + store.state.user.token,

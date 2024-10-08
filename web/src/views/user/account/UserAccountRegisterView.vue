@@ -9,7 +9,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">密码:</label>
-                        <input v-model="password" type="password" class="form-control" id="password" placeholder="请输入密码">
+                        <input v-model="password" type="password" class="form-control" id="password"
+                            placeholder="请输入密码">
                     </div>
                     <div class="mb-3">
                         <label for="confirmedPassword" class="form-label">确认密码:</label>
@@ -42,7 +43,7 @@ export default {
 
         const register = () => {
             $.ajax({
-                url: "https://www.scoxty.com/api/user/account/register",
+                url: "https://www.scoxty.com/codearena/api/user/account/register",
                 type: "post",
                 data: {
                     username: username.value,

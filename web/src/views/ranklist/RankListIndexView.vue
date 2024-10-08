@@ -56,7 +56,7 @@ export default {
         const pull_page = page => {
             current_page = page;
             $.ajax({
-                url: "https://www.scoxty.com/api/rankList/getList",
+                url: "https://www.scoxty.com/codearena/api/rankList/getList",
                 type: "get",
                 data: {
                     page,

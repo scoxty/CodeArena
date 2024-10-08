@@ -74,7 +74,7 @@ export default {
         const pull_page = page => {
             current_page = page;
             $.ajax({
-                url: "https://www.scoxty.com/api/record/getList",
+                url: "https://www.scoxty.com/codearena/api/record/getList",
                 type: "get",
                 data: {
                     page,

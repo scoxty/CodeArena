@@ -26,7 +26,7 @@ export default {
         const md = ref("");
 
         $.ajax({
-            url: "https://www.scoxty.com/api/introduction",
+            url: "https://www.scoxty.com/codearena/api/introduction",
             type: "get",
             headers: {
                 Authorization: "Bearer " + store.state.user.token,
@@ -52,5 +52,3 @@ export default {
     padding: 0 40px;
 }
 </style>
-  
-  

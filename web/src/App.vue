@@ -1,10 +1,13 @@
 <template>
-  <div class="app-container">
+  <div class="app-container" v-if="!is404">
     <NavBar />
     <div class="content-container">
       <router-view />
     </div>
     <BottomInformation />
+  </div>
+  <div class="404" v-else>
+    <router-view />
   </div>
 </template>
 
@@ -18,12 +21,18 @@ export default {
   components: {
     NavBar,
     BottomInformation,
+  },
+  computed: {
+    is404() {
+      // 通过路由的 meta 属性判断是否显示导航栏
+      return this.$route.name === '404';
+    }
   }
 }
 </script>
 
 <style>
-body {
+.app-container {
   /*
     @表示当前项目的根目录
   */
@@ -31,9 +40,7 @@ body {
   background-size: cover;
   /* 或者指定具体尺寸 */
   background-attachment: fixed;
-}
 
-.app-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;

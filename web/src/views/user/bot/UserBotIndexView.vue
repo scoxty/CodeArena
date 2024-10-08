@@ -54,7 +54,8 @@
                                                 </div>
                                             </div>
                                             <VAceEditor v-model:value="botadd.content" @init="editorInit"
-                                                v-model:lang="botadd.type" theme="textmate" style="height: 300px" :options="{
+                                                v-model:lang="botadd.type" theme="textmate" style="height: 300px"
+                                                :options="{
                                                     enableBasicAutocompletion: true, //启用基本自动完成
                                                     enableSnippets: true, // 启用代码段
                                                     enableLiveAutocompletion: true, // 启用实时自动完成
@@ -68,7 +69,8 @@
                                     <div class="modal-footer">
                                         <div class="error_msg">{{ botadd.error_msg }}</div>
                                         <button type="button" class="btn btn-primary" @click="add_bot">创建</button>
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">取消</button>
                                     </div>
                                 </div>
                             </div>
@@ -91,7 +93,8 @@
                                         <button type="button" class="btn btn-secondary" style="margin-right: 10px;"
                                             data-bs-toggle="modal"
                                             :data-bs-target="'#update-bot-modal-' + bot.id">修改</button>
-                                        <button type="button" class="btn btn-danger" @click="remove_bot(bot)">删除</button>
+                                        <button type="button" class="btn btn-danger"
+                                            @click="remove_bot(bot)">删除</button>
                                         <!-- Modal -->
                                         <div class="modal fade" :id="'update-bot-modal-' + bot.id" tabindex="-1">
                                             <div class="modal-dialog modal-xl">
@@ -110,7 +113,8 @@
                                                         <div class="mb-3">
                                                             <label for="description" class="form-label">简介</label>
                                                             <textarea v-model="bot.description" class="form-control"
-                                                                id="description" rows="3" placeholder="字数不超过300"></textarea>
+                                                                id="description" rows="3"
+                                                                placeholder="字数不超过300"></textarea>
                                                         </div>
                                                         <div class="mb-3">
                                                             <div class="row">
@@ -200,7 +204,7 @@ export default {
 
         const refresh_bots = () => {
             $.ajax({
-                url: "https://www.scoxty.com/api/user/bot/getlist",
+                url: "https://www.scoxty.com/codearena/api/user/bot/getlist",
                 type: "get",
                 headers: {
                     Authorization: "Bearer " + store.state.user.token,
@@ -216,7 +220,7 @@ export default {
         const add_bot = () => {
             botadd.error_msg = "";
             $.ajax({
-                url: "https://www.scoxty.com/api/user/bot/add",
+                url: "https://www.scoxty.com/codearena/api/user/bot/add",
                 type: "post",
                 data: {
                     title: botadd.title,
@@ -244,7 +248,7 @@ export default {
 
         const remove_bot = (bot) => {
             $.ajax({
-                url: "https://www.scoxty.com/api/user/bot/remove",
+                url: "https://www.scoxty.com/codearena/api/user/bot/remove",
                 type: "post",
                 data: {
                     bot_id: bot.id,
@@ -263,7 +267,7 @@ export default {
         const update_bot = (bot) => {
             botadd.error_msg = "";
             $.ajax({
-                url: "https://www.scoxty.com/api/user/bot/update",
+                url: "https://www.scoxty.com/codearena/api/user/bot/update",
                 type: "post",
                 data: {
                     bot_id: bot.id,

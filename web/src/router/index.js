@@ -13,7 +13,7 @@ import UserAccountQQWebReceiveCodeViewVue from '../views/user/account/UserAccoun
 
 const routes = [
   {
-    path: "/user/account/login",
+    path: "/codearena/user/account/login",
     name: "user_account_login",
     component: UserAccountLoginView,
     meta: {
@@ -21,7 +21,7 @@ const routes = [
     },
   },
   {
-    path: "/user/account/register",
+    path: "/codearena/user/account/register",
     name: "user_account_register",
     component: UserAccountRegisterView,
     meta: {
@@ -29,7 +29,7 @@ const routes = [
     },
   },
   {
-    path: "/user/account/qq/web/receive_code",
+    path: "/codearena/user/account/qq/web/receive_code",
     name: "user_account_qq_web_receive_code",
     component: UserAccountQQWebReceiveCodeViewVue,
     meta: {
@@ -37,15 +37,15 @@ const routes = [
     },
   },
   {
-    path: "/",
+    path: "/codearena/",
     name: "home",
-    redirect: "/pk",
+    redirect: "/codearena/pk",
     meta: {
       requestAuth: true,
     },
   },
   {
-    path: "/pk",
+    path: "/codearena/pk",
     name: "pk_index",
     component: PkIndexView,
     meta: {
@@ -53,7 +53,7 @@ const routes = [
     },
   },
   {
-    path: "/ranklist",
+    path: "/codearena/ranklist",
     name: "ranklist_index",
     component: RankListIndexView,
     meta: {
@@ -61,7 +61,7 @@ const routes = [
     },
   },
   {
-    path: "/record",
+    path: "/codearena/record",
     name: "record_index",
     component: RecordIndexView,
     meta: {
@@ -69,7 +69,7 @@ const routes = [
     },
   },
   {
-    path: "/record/:recordId",
+    path: "/codearena/record/:recordId",
     name: "record_content",
     component: RecordContentView,
     meta: {
@@ -77,7 +77,7 @@ const routes = [
     },
   },
   {
-    path: "/introduction",
+    path: "/codearena/introduction",
     name: "introduction_index",
     component: IntroductionView,
     meta: {
@@ -85,7 +85,7 @@ const routes = [
     }
   },
   {
-    path: "/user/bot",
+    path: "/codearena/user/bot",
     name: "userbot_index",
     component: UserBotIndexView,
     meta: {
@@ -107,20 +107,21 @@ const routes = [
   /*
     从上至下匹配，若都没匹配上则重定向到404
   */
-]
+];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(),  // 指定 base 为 /codearena
   routes
-})
+});
 
 router.beforeEach((to, from, next) => {
+  console.log(to.fullPath);
+  console.log(to.path)
   if (to.meta.requestAuth && !store.state.user.is_login) {
     next({ name: "user_account_login" });
   } else {
     next();
   }
-})
+});
 
-export default router
-
+export default router;

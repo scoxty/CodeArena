@@ -9,7 +9,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">密码:</label>
-                        <input v-model="password" type="password" class="form-control" id="password" placeholder="请输入密码">
+                        <input v-model="password" type="password" class="form-control" id="password"
+                            placeholder="请输入密码">
                     </div>
                     <div class="error_msg"> {{ error_msg }} </div>
                     <button type="submit" class="btn btn-primary">登录</button>
@@ -83,7 +84,7 @@ export default {
 
         const qq_login = () => {
             $.ajax({
-                url: "https://www.scoxty.com/api/user/account/qq/web/apply_code",
+                url: "https://www.scoxty.com/codearena/api/user/account/qq/web/apply_code",
                 type: "GET",
                 success: resp => {
                     if (resp.result === "success") {

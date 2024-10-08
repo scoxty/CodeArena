@@ -14,7 +14,7 @@ export default {
         const store = useStore();
 
         $.ajax({
-            url: "https://www.scoxty.com/api/user/account/qq/web/receive_code",
+            url: "https://www.scoxty.com/codearena/api/user/account/qq/web/receive_code",
             type: "GET",
             data: {
                 code: myRoute.query.code,

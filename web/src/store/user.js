@@ -44,7 +44,7 @@ export default {
     actions: {
         login(context, data) {
             $.ajax({
-                url: "https://www.scoxty.com/api/user/account/token",
+                url: "https://www.scoxty.com/codearena/api/user/account/token",
                 type: "post",
                 data: {
                     username: data.username,
@@ -60,7 +60,7 @@ export default {
 
                         context.state.refresh_token_interval = setInterval(() => {
                             $.ajax({
-                                url: "https://www.scoxty.com/api/user/account/refresh_token",
+                                url: "https://www.scoxty.com/codearena/api/user/account/refresh_token",
                                 type: "POST",
                                 data: {
                                     refresh_token: context.state.refresh_token,
@@ -93,7 +93,7 @@ export default {
         },
         getinfo(context, data) {
             $.ajax({
-                url: "https://www.scoxty.com/api/user/account/info",
+                url: "https://www.scoxty.com/codearena/api/user/account/info",
                 type: "get",
                 headers: {
                     Authorization: "Bearer " + context.state.token,
