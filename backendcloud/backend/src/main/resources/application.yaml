@@ -16,11 +16,11 @@ spring:
           min-idle: 0
           max-wait: -1
         host: 8.134.107.55
-      password: .Xty510521
+      password: ******
   datasource:
     url: jdbc:mysql:///codearena
     username: root
-    password: .Xty510521
+    password: ******
     driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
     time-zone: GMT+8
