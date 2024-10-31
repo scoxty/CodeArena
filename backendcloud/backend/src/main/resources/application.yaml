@@ -15,7 +15,7 @@ spring:
           max-idle: 8
           min-idle: 0
           max-wait: -1
-        host: 8.134.107.55
+        host: ******
       password: ******
   datasource:
     url: jdbc:mysql:///codearena
