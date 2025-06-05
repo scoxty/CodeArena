@@ -11,5 +11,5 @@ https://www.scoxty.com/codearena/pk
 # 项目设计概要：
 ![image](https://github.com/scoxty/Kob/assets/95528203/9d3c99a6-7119-407e-a487-a34aaf88765a)
 
-# 数据库ER图：
+# 数据库表：
 ![image](https://github.com/scoxty/CodeArena/assets/95528203/992d3f95-13f4-49e4-aa20-2ea8abbda5e1)
