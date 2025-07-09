@@ -8,7 +8,7 @@ https://www.scoxty.com/codearena/pk (已下线)
 
 密码: 123456
 
-# 项目设计概要：
+# 设计概要：
 ![image](https://github.com/scoxty/Kob/assets/95528203/9d3c99a6-7119-407e-a487-a34aaf88765a)
 
 # 数据库表：
